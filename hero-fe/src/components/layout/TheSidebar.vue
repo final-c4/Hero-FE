@@ -13,7 +13,7 @@
           </RouterLink>
         </li>
 
-        <!-- 근태관리 (서브메뉴 포함) -->
+        <!-- 근태관리  -->
         <li
           class="sidebar__item"
           :class="{ 'sidebar__item--active': isActive('/attendance') }"
@@ -46,7 +46,7 @@
               </RouterLink>
             </li>
             <li>
-              <!-- TODO: /attendance/work-time 같은 라우트 생기면 수정 -->
+           
               <button class="sidebar__submenu-link">
                 근무 시간 변경
               </button>
@@ -167,7 +167,7 @@ const toggleSidebar = () => {
   margin-bottom: 4px;
 }
 
-/* RouterLink / button 공용 스타일 */
+
 .sidebar__link {
   width: 100%;
   border: none;
@@ -211,7 +211,7 @@ const toggleSidebar = () => {
   color: #9ca3af;
 }
 
-/* 활성 메뉴 (gradient 버튼) */
+
 .sidebar__item--active .sidebar__link {
   background: linear-gradient(135deg, #06336f, #123c9c);
   color: #ffffff;
@@ -222,7 +222,7 @@ const toggleSidebar = () => {
   color: #e5e7eb;
 }
 
-/* 서브메뉴 */
+
 .sidebar__submenu {
   list-style: none;
   margin: 4px 0 8px;
@@ -256,7 +256,7 @@ const toggleSidebar = () => {
   color: #ffffff;
 }
 
-/* 하단 */
+
 .sidebar__bottom {
   padding: 12px 16px 20px;
   border-top: 1px solid #eef0f4;
