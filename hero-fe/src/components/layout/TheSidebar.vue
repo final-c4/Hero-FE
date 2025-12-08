@@ -16,40 +16,46 @@
         <!-- 근태관리  -->
         <li
           class="sidebar__item"
-          :class="{ 'sidebar__item--active': isActive('/attendance') }"
+          :class="{ 'sidebar__item--active': route.path.startsWith('/attendance') }"
         >
           <RouterLink
-            to="/attendance"
+            to="/attendance" 
             class="sidebar__link sidebar__link--with-caret"
           >
             <span class="sidebar__icon">⏱</span>
             <span v-if="!isCollapsed" class="sidebar__label">근태관리</span>
-            <span
-              v-if="!isCollapsed"
-              class="sidebar__caret"
-            >
-              ⌵
-            </span>
+            <span v-if="!isCollapsed"class="sidebar__caret">⌵</span>
           </RouterLink>
 
           <!-- 근태 서브 메뉴 (접혔을 땐 안보이게) -->
           <ul v-if="!isCollapsed" class="sidebar__submenu">
+
+            <!-- 개인 근태 기록 디폴트 값-->
             <li>
               <RouterLink
-                to="/attendance"
+                to="/attendance/attendance_record/personal"
                 class="sidebar__submenu-link"
                 :class="{
-                  'sidebar__submenu-link--active': route.path === '/attendance'
+                  'sidebar__submenu-link--active': 
+                    route.path.startsWith('/attendance/attendance_record')
                 }"
               >
                 근태 기록
               </RouterLink>
             </li>
+
+            <!-- 부서 근태 현황 -->
             <li>
-           
-              <button class="sidebar__submenu-link">
-                근무 시간 변경
-              </button>
+              <RouterLink
+                to="/attendance/department"
+                class="sidebar__submenu-link"
+                :class="{
+                  'sidebar__submenu-link--active':
+                    route.path.startsWith('/attendance/department')
+                }"
+              >
+                부서 근태 현황   
+              </RouterLink>
             </li>
           </ul>
         </li>

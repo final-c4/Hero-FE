@@ -1,7 +1,7 @@
 <template>
   <section>
-    <h2>근태 관리</h2>
-    <p>근태 관리 메인 페이지입니다.</p>
+    <h2>초과 근무</h2>
+    <p>초과 근무 관련 페이지입니다.</p>
   </section>
 </template>
 
