@@ -8,6 +8,7 @@ import payrollRoutes from './modules/payroll';
 import performanceRoutes from './modules/performance';
 import personnelRoutes from './modules/personnel';
 
+
 const routes: RouteRecordRaw[] = [
   {
     path: '/',

@@ -1,0 +1,416 @@
+<template>
+  <Teleport to="body">
+    <div
+      v-if="open"
+      class="modal-backdrop"
+      @click.self="close"
+    >
+      <div class="modal">
+        <header class="modal-header">
+          <h2>지급 계좌 관리</h2>
+          <button class="modal-close" @click="close">✕</button>
+        </header>
+
+        <section class="payslip-body">
+          <!-- 등록된 계좌 목록 -->
+          <div class="account-list">
+            <h3 class="account-section-title">등록된 계좌</h3>
+            <p v-if="!accounts.length" class="account-empty">
+              등록된 계좌가 없습니다. 아래에서 새 계좌를 추가해주세요.
+            </p>
+            <ul v-else class="account-list-ul">
+              <li
+                v-for="acc in accounts"
+                :key="acc.id"
+                class="account-item"
+                :class="{ 'account-item--selected': selectedAccountId === acc.id }"
+                @click="
+                  () => {
+                    selectedAccountId = acc.id;
+                    isAddingNew = false;
+                  }
+                "
+              >
+                <div class="account-item-main">
+                  <input
+                    type="radio"
+                    :value="acc.id"
+                    v-model="selectedAccountId"
+                    @click.stop
+                  />
+                  <div class="account-item-text">
+                    <p class="account-item-bank">{{ acc.bankName }}</p>
+                    <p class="account-item-number">
+                      {{ acc.accountNumber }} ({{ acc.accountHolder }})
+                    </p>
+                  </div>
+                </div>
+                <span v-if="acc.isPrimary" class="account-badge">
+                  급여 수령 계좌
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="account-divider"></div>
+
+          <!-- 새 계좌 추가 -->
+          <div class="account-form-wrapper">
+            <div class="account-form-header">
+              <h3 class="account-section-title">새 계좌 추가</h3>
+              <button
+                type="button"
+                class="btn-link-small"
+                @click="toggleNewAccount"
+              >
+                {{ isAddingNew ? '새 계좌 입력 취소' : '새 계좌 입력하기' }}
+              </button>
+            </div>
+
+            <form
+              v-if="isAddingNew"
+              class="account-form"
+              @submit.prevent="saveAccount"
+            >
+              <div class="form-row">
+                <label class="form-label">은행명</label>
+                <input
+                  v-model="accountForm.bankCode"
+                  type="text"
+                  class="form-input"
+                  placeholder="예: 우리은행"
+                />
+              </div>
+              <div class="form-row">
+                <label class="form-label">계좌번호</label>
+                <input
+                  v-model="accountForm.accountNumber"
+                  type="text"
+                  class="form-input"
+                  placeholder="계좌번호를 입력하세요"
+                />
+              </div>
+              <div class="form-row">
+                <label class="form-label">예금주</label>
+                <input
+                  v-model="accountForm.accountHolder"
+                  type="text"
+                  class="form-input"
+                  placeholder="예금주명을 입력하세요"
+                />
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <footer class="modal-footer">
+          <button class="btn-secondary" @click="close">취소</button>
+          <button class="btn-primary" @click="saveAccount">저장</button>
+        </footer>
+      </div>
+    </div>
+  </Teleport>
+</template>
+
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { usePayrollStore } from '@/stores/payrollStore';
+// 타입 정의는 프로젝트 구조에 맞게 조정해줘
+import type { BankAccount, MyPaySummary } from '@/types/payroll';
+
+const props = defineProps<{
+  open: boolean;
+  accounts: BankAccount[];
+  summary: MyPaySummary | null;
+  selectedMonth: string;
+}>();
+
+const emit = defineEmits<{
+  (e: 'update:open', value: boolean): void;
+  (e: 'saved'): void;
+}>();
+
+const store = usePayrollStore();
+
+const selectedAccountId = ref<number | null>(null);
+const isAddingNew = ref(false);
+const accountForm = ref({
+  bankCode: '',
+  accountNumber: '',
+  accountHolder: ''
+});
+
+// 모달이 열릴 때마다 현재 선택/폼 초기화
+watch(
+  () => props.open,
+  (val) => {
+    if (!val) return;
+
+    // summary 기준으로 현재 계좌 찾기
+    if (props.summary) {
+      const current = props.accounts.find(
+        (acc) => acc.accountNumber === props.summary!.bankAccountNumber
+      );
+      if (current) {
+        selectedAccountId.value = current.id;
+      } else {
+        const primary = props.accounts.find((acc) => acc.isPrimary);
+        selectedAccountId.value = primary ? primary.id : null;
+      }
+    } else {
+      const primary = props.accounts.find((acc) => acc.isPrimary);
+      selectedAccountId.value = primary ? primary.id : null;
+    }
+
+    isAddingNew.value = false;
+    accountForm.value = {
+      bankCode: '',
+      accountNumber: '',
+      accountHolder: ''
+    };
+  },
+  { immediate: true }
+);
+
+const close = () => {
+  emit('update:open', false);
+};
+
+const toggleNewAccount = () => {
+  isAddingNew.value = !isAddingNew.value;
+  if (!isAddingNew.value) {
+    accountForm.value = {
+      bankCode: '',
+      accountNumber: '',
+      accountHolder: ''
+    };
+  }
+};
+
+const saveAccount = async () => {
+  try {
+    let targetAccountId = selectedAccountId.value;
+
+    // 새 계좌 추가 모드
+    if (isAddingNew.value) {
+      if (
+        !accountForm.value.bankCode.trim() ||
+        !accountForm.value.accountNumber.trim() ||
+        !accountForm.value.accountHolder.trim()
+      ) {
+        // TODO: 에러 토스트 띄우고 싶으면 여기서 처리
+        return;
+      }
+
+      const newAcc = await store.addMyBankAccount({
+        bankCode: accountForm.value.bankCode.trim(),
+        accountNumber: accountForm.value.accountNumber.trim(),
+        accountHolder: accountForm.value.accountHolder.trim()
+      });
+
+      targetAccountId = newAcc.id;
+    }
+
+    if (targetAccountId != null) {
+      await store.setPrimaryBankAccount(targetAccountId);
+    }
+
+    emit('saved');        // 부모에게 "저장 끝났어" 알림
+    emit('update:open', false); // 모달 닫기
+  } catch (e) {
+    console.error('계좌 정보 저장 실패', e);
+  }
+};
+</script>
+
+<style scoped>
+/* 모달 스타일 – 기존 것 재사용 */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 40;
+}
+
+.modal {
+  background-color: #ffffff;
+  border-radius: 16px;
+  width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.payslip-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* 계좌 전용 스타일 */
+.account-list {
+  margin-bottom: 12px;
+}
+
+.account-section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.account-empty {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.account-list-ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.account-item {
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.account-item--selected {
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.account-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-item-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-item-bank {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.account-item-number {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.account-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.account-divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 12px 0;
+}
+
+.account-form-wrapper {
+  margin-top: 4px;
+}
+
+.account-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-link-small {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-size: 12px;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.form-input {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* 버튼 공통 – 페이지에서 쓰는 클래스 재사용용 */
+.btn-primary,
+.btn-secondary {
+  border-radius: 999px;
+  font-size: 13px;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #06336f, #123c9c);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: #eef2ff;
+  color: #374151;
+}
+</style>

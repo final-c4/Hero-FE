@@ -12,14 +12,14 @@ export const useSessionStore = defineStore("session", () => {
         timer = window.setInterval(() => {
             remainingSeconds.value--;
             if (remainingSeconds.value <= 0) {
-                // TODO: 실제 로그아웃 처리 (API, 토큰 삭제 등)
+                //후에 해야될것 -> 실제 로그아웃 처리 (API, 토큰 삭제 등)
                 console.log("⏳ 세션 만료, 로그아웃 처리");
                 stopSession();
             }
         }, 1000);
     };
 
-    // ✅ 페이지 전환될 때만 호출
+    // 페이지 전환될 때만 호출
     const refreshSession = () => {
         remainingSeconds.value = 3600;
     };

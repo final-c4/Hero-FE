@@ -35,6 +35,12 @@ watch(
 );
 </script>
 
+<style>
+html {
+  font-size: 14px;
+}
+</style>
+
 <style scoped>
 #app {
   min-height: 100vh;
@@ -46,11 +52,12 @@ watch(
 .layout-body {
   flex: 1;
   display: flex;
+  align-items: stretch;
 }
 
 .main-content {
   flex: 1;
-  padding: 24px;
+  padding: 16px;
   background-color: #f5f6fa;
 }
 </style>

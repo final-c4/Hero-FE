@@ -3,12 +3,19 @@ import type { RouteRecordRaw } from 'vue-router';
 const payrollRoutes: RouteRecordRaw[] = [
   {
     path: '/payroll',
-    name: 'Payroll',
+    name: 'PayrollMain',
     component: () => import('@/views/payroll/Index.vue'),
     meta: {
       title: '급여 관리',
     },
-    children: [],
+  },
+  {
+    path: '/payroll/history',
+    name: 'PayrollHistory',
+    component: () => import('@/views/payroll/History.vue'),
+    meta: {
+      title: '급여 이력',
+    },
   },
 ];
 

@@ -68,7 +68,7 @@ const formattedTime = computed(() => {
 
 <style scoped>
 .header {
-  height: 90px;
+  height: 75px;
   padding: 0px;
   background-color: #ffffff;
   border-bottom: 1px solid #e5e7eb;
@@ -106,7 +106,7 @@ const formattedTime = computed(() => {
 .header__brand-main {
   margin-left:32px;
   font-size: 30px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.01em;
 }
 
@@ -129,13 +129,14 @@ const formattedTime = computed(() => {
 
 
 .header__right {
-  padding : 0 28px;
+  padding : 0 32px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
 .header__icon-btn {
+  margin-right:8px;
   border: none;
   background: #f3f4ff;
   width: 36px;
@@ -194,7 +195,7 @@ const formattedTime = computed(() => {
 .header__banner-link {
   display: inline-flex;
   align-items: center;
-  gap: 16px;
+  gap: 3px;
   text-decoration: none;
 }
 
@@ -205,7 +206,7 @@ const formattedTime = computed(() => {
 }
 
 .header__session-box {
-  padding: 8px 14px;
+  padding: 6px 14px;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
   display: flex;

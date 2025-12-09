@@ -13,7 +13,7 @@
           </RouterLink>
         </li>
 
-        <!-- 근태관리  -->
+        <!-- 근태관리 -->
         <li
           class="sidebar__item"
           :class="{ 'sidebar__item--active': isActive('/attendance') }"
@@ -86,19 +86,49 @@
         </li>
 
         <!-- 급여 -->
-        <li
-          class="sidebar__item"
-          :class="{ 'sidebar__item--active': isActive('/payroll') }"
-        >
-          <RouterLink
-            to="/payroll"
-            class="sidebar__link sidebar__link--with-caret"
-          >
-            <span class="sidebar__icon">💲</span>
-            <span v-if="!isCollapsed" class="sidebar__label">급여</span>
-            <span v-if="!isCollapsed" class="sidebar__caret">⌵</span>
-          </RouterLink>
-        </li>
+
+<li
+  class="sidebar__item"
+  :class="{ 'sidebar__item--active': isActive('/payroll') }"
+>
+  <!-- 상단 제목 버튼: 클릭하면 드롭다운 토글 -->
+  <button
+    class="sidebar__link sidebar__link--with-caret"
+    @click="togglePayroll"
+  >
+    <span class="sidebar__icon">💰</span>
+    <span v-if="!isCollapsed" class="sidebar__label">급여</span>
+    <span v-if="!isCollapsed" class="sidebar__caret">
+      {{ payrollOpen ? '⌃' : '⌵' }}
+    </span>
+  </button>
+
+  <!--서브메뉴: 접혔을 땐 숨김, 펼쳤을 때만 표시 -->
+  <ul v-if="!isCollapsed && payrollOpen" class="sidebar__submenu">
+    <li>
+      <RouterLink
+        to="/payroll"
+        class="sidebar__submenu-link"
+        :class="{
+          'sidebar__submenu-link--active': route.path === '/payroll'
+        }"
+      >
+        내 급여
+      </RouterLink>
+    </li>
+    <li>
+      <RouterLink
+        to="/payroll/history"
+        class="sidebar__submenu-link"
+        :class="{
+          'sidebar__submenu-link--active': route.path === '/payroll/history'
+        }"
+      >
+       내 급여 이력
+      </RouterLink>
+    </li>
+  </ul>
+</li>
       </ul>
     </nav>
 
@@ -120,6 +150,7 @@ import { RouterLink, useRoute } from 'vue-router';
 
 const route = useRoute();
 const isCollapsed = ref(false);
+const payrollOpen = ref(false);
 
 const isActive = (basePath: string) => {
   return route.path.startsWith(basePath);
@@ -128,13 +159,24 @@ const isActive = (basePath: string) => {
 const toggleSidebar = () => {
   isCollapsed.value = !isCollapsed.value;
 };
+
+// 급여 메뉴 드롭다운 토글
+const togglePayroll = () => {
+  payrollOpen.value = !payrollOpen.value;
+};
+
+// 현재 라우트에 따라 급여 메뉴 자동으로 펼치기
+if (route.path.startsWith('/payroll')) {
+  payrollOpen.value = true;
+}
 </script>
 
 <style scoped>
 .sidebar {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  /* height: 100vh; */
+  min-height: 100%;
   width: 260px;
   background-color: #ffffff;
   border-right: 1px solid #eef0f4;
@@ -148,7 +190,8 @@ const toggleSidebar = () => {
 }
 
 .sidebar__nav {
-  padding: 0 16px;
+  padding:0;
+  /* padding-right:16px; */
   flex: 1;
   overflow-y: auto;
 }
@@ -252,7 +295,7 @@ const toggleSidebar = () => {
 }
 
 .sidebar__submenu-link--active {
-  background-color: #4f88ff;
+  background: linear-gradient(135deg, #06336f, #123c9c);
   color: #ffffff;
 }
 
