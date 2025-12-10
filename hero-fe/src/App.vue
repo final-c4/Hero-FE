@@ -73,21 +73,26 @@ html {
 
 <style scoped>
 #app {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: #f5f6fa;
+  overflow: hidden;
 }
 
 .layout-body {
   flex: 1;
   display: flex;
-  align-items: stretch;
+  min-height: 0;              
+  overflow: hidden; 
 }
 
 .main-content {
   flex: 1;
-  padding: 0;
-  background: #F9FAFB;
+  padding: 0px;
+  background: #f5f6fa;
+  height: 100%;               
+  min-height: 0;              
+  overflow-y: auto; 
 }
 </style>

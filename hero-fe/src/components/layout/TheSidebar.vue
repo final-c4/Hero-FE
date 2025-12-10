@@ -268,8 +268,9 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-import { useRouter} from 'vue-router';
+
 const router = useRouter();
 // 활성화 된 상위 메뉴
 const activeParent = ref<string>('dashboard');
@@ -342,6 +343,10 @@ const handleParentClick = (key: string) => {
 const handleSubMenuClick = (key: string) => {
   activeSubMenu.value = key;
 
+  if (key === 'template') {
+    router.push('/evaluationtemplatelist');
+  }
+
 
   if (key === 'myPayroll') {
     router.push('/payroll'); 
@@ -371,7 +376,8 @@ const handleCollapse = () => {
 
 <style scoped>
 .sidebar-container {
-  height: 100vh;
+  height: 100%;
+  max-width: 100%;
   width: 230px;
   background: white;
   transition: width 0.3s ease;
