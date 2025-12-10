@@ -223,7 +223,7 @@ import { ref } from 'vue';
 
 const router = useRouter();
 
-const activeParent = ref<string>('dashboard');
+const activeParent = ref<string>('');
 const activeSubMenu = ref<string>('');
 
 const isPersonnelOpen = ref<boolean>(false);
@@ -269,7 +269,9 @@ const handleSubMenuClick = (key: string) => {
   activeSubMenu.value = key;
 
   if (key === 'template') {
-    router.push('/evaluationtemplatelist');
+    router.push('/evaluation/template/list');
+  }else if (key === 'guide') {
+    router.push('/evaluation/guide/list')
   }
 };
 
@@ -301,6 +303,17 @@ const handleCollapse = () => {
   background: white;
   transition: width 0.3s ease;
   overflow: hidden;
+
+  overflow-y: auto;
+  /* IE, Edge (구버전) */
+  -ms-overflow-style: none;
+    /* Firefox */
+  scrollbar-width: none;
+}
+
+/* sidebar 내 스크롤 바 숨기는 CSS */
+.sidebar-container::-webkit-scrollbar {
+    display: none;
 }
 
 .sidebar-container.collapsed {
