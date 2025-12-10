@@ -1,10 +1,27 @@
-// 급여 공통 항목
+/**
+ * TypeScript Name : payroll.ts
+ * Description : 급여 도메인의 타입 정의 (인터페이스)
+ *               [Frontend 급여 화면에서 사용하는 모든 DTO 타입 정의]
+ *
+ * History
+ * 2025/12/09 - 동근 최초 작성
+ *
+ * @module payroll-types
+ * @author 동근
+ * @version 1.0
+ */
+
+// 급여 공통 항목 (수당, 공제 모두 이 인터페이스 사용)
 export interface PayItem {
+    /**항목명 */
     name: string;
+    /**항목 금액 */
     amount: number;
 }
 
-// /api/me/payroll 응답
+/**
+ * /api/me/payroll 응답 DTO (내 급여)
+ */
 export interface MyPaySummary {
     salaryMonth: string;
     basesalary: number;
@@ -22,7 +39,9 @@ export interface MyPaySummary {
     deductions: PayItem[];
 }
 
-// /api/me/payroll/payslip 응답
+/**  
+ * /api/me/payroll/payslip 응답 DTO
+ */
 export interface PayslipDetail {
     salaryMonth: string;
     employeeName: string;
@@ -36,7 +55,9 @@ export interface PayslipDetail {
     pdfUrl: string | null;
 }
 
-// 급여 이력
+/**
+ * 급여 이력
+ */
 export interface PayHistoryRow {
     salaryMonth: string;
     baseSalary: number;
@@ -46,11 +67,16 @@ export interface PayHistoryRow {
     remark: string;
 }
 
+/** 
+ * 급여 추이 차트 데이터 포인트
+ */
 export interface PayHistoryChartPoint {
     salaryMonth: string;
     netPay: number;
 }
-
+/**
+ * /api/me/payroll/history 응답 DTO (내 급여 이력)
+ */
 export interface PayHistoryResponse {
     avgNetPay: number;
     maxNetPay: number;
@@ -61,8 +87,9 @@ export interface PayHistoryResponse {
     rows: PayHistoryRow[];
 }
 
-/** 계좌 관리 */
-
+/**
+  * 급여 수령 계좌 정보
+  */
 export interface BankAccount {
     id: number;
     bankName: string;
@@ -71,12 +98,4 @@ export interface BankAccount {
     accountHolder: string;
     isPrimary: boolean;
     createdAt: string;
-}
-
-export interface BankAccountHistoryRow {
-    bankName: string;
-    accountNumber: string;
-    accountHolder: string;
-    changedAt: string;
-    changedByName: string;
 }

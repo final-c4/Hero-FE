@@ -1,8 +1,35 @@
+<!--
+ * <pre>
+ * Vue Name        : Index.vue
+ * Description     : 사원용 내 급여 메인 화면
+ *
+ * 기능
+ *  - 급여월 선택 및 내 급여 요약 조회
+ *  - 지급/공제 내역 상세 표시
+ *  - 근로 정보(근무일수/근무시간/초과근무) 표시
+ *  - 지급 정보(지급 계좌 + 급여일) 표시
+ *  - 급여 명세서 모달 / PDF 다운로드
+ *  - 지급 계좌 관리 모달 연동
+ *
+ * History
+ *   2025/12/09 - 동근 최초 작성
+ * </pre>
+ *
+ * @module payroll-main
+ * @author 동근
+ * @version 1.0
+ -->
+
 <template>
   <div class="payroll-page">
+    <!-- 헤더영역(급여월 선택 + 명세서 버튼) -->
     <header class="payroll-header">
       <div class="payroll-header__right">
-        <select v-model="selectedMonth" class="month-select" @change="onChangeMonth">
+        <select
+          v-model="selectedMonth"
+          class="month-select"
+          @change="onChangeMonth"
+        >
           <option v-for="m in monthOptions" :key="m.value" :value="m.value">
             {{ m.label }}
           </option>
@@ -19,26 +46,7 @@
       </div>
     </header>
 
-    <section v-if="summary" class="summary-cards">
-      <div class="summary-card">
-        <span class="summary-label">실수령액</span>
-        <p class="summary-value">{{ formatMoney(summary.netPay) }}</p>
-        <p class="summary-caption">{{ summary.salaryMonth }}월</p>
-      </div>
-      <div class="summary-card">
-        <span class="summary-label">지급 총액</span>
-        <p class="summary-value">{{ formatMoney(summary.grossPay) }}</p>
-      </div>
-      <div class="summary-card">
-        <span class="summary-label">공제 총액</span>
-        <p class="summary-value">{{ formatMoney(summary.totalDeduction) }}</p>
-      </div>
-      <div class="summary-card">
-        <span class="summary-label">근무일수</span>
-        <p class="summary-value">{{ summary.workDays }}일</p>
-      </div>
-    </section>
-
+    <!-- 지급 / 공제 내역 -->
     <section v-if="summary" class="pay-detail">
       <!-- 지급 내역 -->
       <div class="pay-panel pay-panel--left">
@@ -48,6 +56,7 @@
             <span class="pay-name">기본급</span>
             <span class="pay-amount">{{ formatMoney(summary.basesalary) }}</span>
           </div>
+          <!-- 수당 항목 -->
           <div
             v-for="item in summary.allowances"
             :key="item.name"
@@ -58,6 +67,7 @@
               +{{ formatMoney(item.amount) }}
             </span>
           </div>
+          <!-- 지급 총액 -->
           <div class="pay-row pay-row--total">
             <span class="pay-name">지급 총액</span>
             <span class="pay-amount">{{ formatMoney(summary.grossPay) }}</span>
@@ -81,7 +91,9 @@
           </div>
           <div class="pay-row pay-row--total pay-row--deduction-total">
             <span class="pay-name">공제 총액</span>
-            <span class="pay-amount">{{ formatMoney(summary.totalDeduction) }}</span>
+            <span class="pay-amount">
+              {{ formatMoney(summary.totalDeduction) }}
+            </span>
           </div>
         </div>
       </div>
@@ -104,9 +116,20 @@
           <p class="work-value">{{ summary.overtimeHours }}시간</p>
         </div>
       </div>
+      <p
+        v-if="
+          summary.workDays === 0 &&
+          summary.workHours === 0 &&
+          summary.overtimeHours === 0
+        "
+        class="work-empty-note"
+      >
+        해당 월은 근로 시간이 집계되지 않았습니다.
+        (포괄임금제 또는 비근무월일 수 있습니다)
+      </p>
     </section>
 
-    <!-- 계좌 + 급여일 통합 섹션 -->
+    <!-- 지급 정보 (계좌 + 급여일) -->
     <section v-if="summary" class="pay-meta">
       <div class="pay-meta-card pay-meta-card--full">
         <h2 class="panel-title">지급 정보</h2>
@@ -135,82 +158,14 @@
     </section>
 
     <!-- 명세서 모달 -->
-    <Teleport to="body">
-      <div v-if="payslipModalOpen" class="modal-backdrop" @click.self="closePayslip">
-        <div class="modal" ref="payslipRef">
-          <header class="modal-header">
-            <h2>급여 명세서</h2>
-            <button class="modal-close" @click="closePayslip">✕</button>
-          </header>
+    <PayslipModal
+      v-model:open="payslipModalOpen"
+      :payslip="payslip"
+      :month="selectedMonth"
+      :auto-download-key="autoDownloadKey"
+    />
 
-          <section v-if="payslip" class="payslip-body">
-            <div class="payslip-header">
-              <div>
-                <p class="payslip-month">{{ payslip.salaryMonth }}월 급여명세서</p>
-              </div>
-              <div class="payslip-meta">
-                <p>사원명: {{ payslip.employeeName }}</p>
-                <p>부서: {{ payslip.departmentName }}</p>
-              </div>
-            </div>
-
-            <div class="payslip-section">
-              <h3>지급 내역</h3>
-              <div class="payslip-table">
-                <div class="payslip-row">
-                  <span>기본급</span>
-                  <span>{{ formatMoney(payslip.baseSalary) }}</span>
-                </div>
-                <div
-                  v-for="item in payslip.allowances"
-                  :key="item.name"
-                  class="payslip-row"
-                >
-                  <span>{{ item.name }}</span>
-                  <span>{{ formatMoney(item.amount) }}</span>
-                </div>
-                <div class="payslip-row payslip-row--total">
-                  <span>지급 총액</span>
-                  <span>{{ formatMoney(payslip.grossPay) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="payslip-section">
-              <h3>공제 내역</h3>
-              <div class="payslip-table">
-                <div
-                  v-for="item in payslip.deductions"
-                  :key="item.name"
-                  class="payslip-row payslip-row--deduction"
-                >
-                  <span>{{ item.name }}</span>
-                  <span>-{{ formatMoney(item.amount) }}</span>
-                </div>
-                <div class="payslip-row payslip-row--total">
-                  <span>공제 총액</span>
-                  <span>{{ formatMoney(payslip.totalDeduction) }}</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="payslip-section payslip-section--net">
-              <span>실수령액</span>
-              <span class="payslip-net">{{ formatMoney(payslip.netPay) }}</span>
-            </div>
-          </section>
-
-          <footer class="modal-footer">
-            <button class="btn-secondary" @click="closePayslip">닫기</button>
-            <button class="btn-primary" @click="downloadPayslipPdf">
-              PDF 다운로드
-            </button>
-          </footer>
-        </div>
-      </div>
-    </Teleport>
-
-    <!-- 계좌 관리 모달 컴포넌트 -->
+    <!-- 계좌 관리 모달 -->
     <AccountModal
       v-model:open="accountModalOpen"
       :accounts="bankAccounts"
@@ -222,28 +177,35 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, nextTick } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { usePayrollStore } from '@/stores/payrollStore';
-import html2pdf from 'html2pdf.js';
-import AccountModal from '@/views/payroll/AccountModal.vue';
+import AccountModal from '@/views/payroll/BankAccountModal.vue';
+import PayslipModal from '@/views/payroll/PayslipModal.vue';
 
+// 급여 도메인 Pinia Store (summary, payslip, accounts 등 상태 및 API 호출 제공)
 const store = usePayrollStore();
 
+/**
+ * payslipModalOpen - 급여 명세서 모달
+ * accountModalOpen - 계좌 관리 모달
+ */
 const payslipModalOpen = ref(false);
-const payslipRef = ref<HTMLElement | null>(null);
-
 const accountModalOpen = ref(false);
 
+// 요약, 명세서, 계좌 데이터
 const summary = computed(() => store.summary);
 const payslip = computed(() => store.payslip);
 const bankAccounts = computed(() => store.accounts);
 
+// 급여월 선택 옵션 (최근 12개월)
 const monthOptions = computed(() => {
   const now = new Date();
   const arr: { value: string; label: string }[] = [];
   for (let i = 0; i < 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const ymVal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const ymVal = `${d.getFullYear()}-${String(
+      d.getMonth() + 1
+    ).padStart(2, '0')}`;
     arr.push({
       value: ymVal,
       label: `${d.getFullYear()}년 ${d.getMonth() + 1}월`
@@ -253,7 +215,10 @@ const monthOptions = computed(() => {
 });
 
 const selectedMonth = ref<string>('');
+// 명세서 모달 내부에서 자동 PDF 다운로드 트리거 키
+const autoDownloadKey = ref(0);
 
+// 초기 진입 시 내 급여 데이터 로드
 onMounted(async () => {
   await store.loadMyPayroll();
   if (store.summary) {
@@ -263,6 +228,7 @@ onMounted(async () => {
   }
 });
 
+// 급여월 변경 시 해당 월의 내 급여 정보 재조회
 const onChangeMonth = () => {
   store.loadMyPayroll(selectedMonth.value);
 };
@@ -273,8 +239,22 @@ const openPayslip = async () => {
   payslipModalOpen.value = true;
 };
 
-const closePayslip = () => {
-  payslipModalOpen.value = false;
+// 헤더 명세서 다운로드 클릭 시 명세서 로드 + 모달 열고 자동 다운로드 트리거
+const downloadPayslipPdf = async () => {
+  if (!selectedMonth.value) {
+    if (summary.value) {
+      selectedMonth.value = summary.value.salaryMonth;
+    } else {
+      return;
+    }
+  }
+
+  if (!payslip.value) {
+    await store.loadPayslip(selectedMonth.value);
+  }
+
+  payslipModalOpen.value = true;
+  autoDownloadKey.value++;
 };
 
 //  계좌 모달 열기
@@ -292,101 +272,8 @@ const onAccountSaved = async () => {
   }
 };
 
-const downloadPayslipPdf = async () => {
-  if (!selectedMonth.value) {
-    if (summary.value) {
-      selectedMonth.value = summary.value.salaryMonth;
-    } else {
-      return;
-    }
-  }
-
-  if (!payslip.value) {
-    await store.loadPayslip(selectedMonth.value);
-  }
-
-  let shouldCloseAfter = false;
-  if (!payslipModalOpen.value) {
-    payslipModalOpen.value = true;
-    shouldCloseAfter = true;
-    await nextTick();
-  }
-
-  if (!payslipRef.value) return;
-
-  const modalEl = payslipRef.value;
-  const bodyEl = modalEl.querySelector('.payslip-body') as HTMLElement | null;
-  const closeBtn = modalEl.querySelector('.modal-close') as HTMLElement | null;
-  const footerEl = modalEl.querySelector('.modal-footer') as HTMLElement | null;
-
-  const prevModalMaxHeight = modalEl.style.maxHeight;
-  const prevModalHeight = modalEl.style.height;
-  const prevModalOverflow = modalEl.style.overflow;
-  const prevModalWidth = modalEl.style.width;
-  const prevModalMargin = modalEl.style.margin;
-
-  const prevBodyMaxHeight = bodyEl?.style.maxHeight ?? '';
-  const prevBodyOverflow = bodyEl?.style.overflow ?? '';
-
-  const prevCloseDisplay = closeBtn?.style.display ?? '';
-  const prevFooterDisplay = footerEl?.style.display ?? '';
-
-  try {
-    // PDF용 스타일 적용
-    modalEl.style.maxHeight = 'none';
-    modalEl.style.height = 'auto';
-    modalEl.style.overflow = 'visible';
-
-    // PDF 가로폭 조절
-    modalEl.style.width = '720px';
-    modalEl.style.margin = '0 auto';
-
-    if (bodyEl) {
-      bodyEl.style.maxHeight = 'none';
-      bodyEl.style.overflow = 'visible';
-    }
-
-    if (closeBtn) closeBtn.style.display = 'none';
-    if (footerEl) footerEl.style.display = 'none';
-
-    modalEl.scrollIntoView({ block: 'center' });
-
-    const opt = {
-      margin: 10,
-      filename: `payslip-${selectedMonth.value}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: {
-        scale: 2,
-        scrollY: 0
-      },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-
-    await html2pdf().set(opt).from(modalEl).save();
-  } finally {
-    modalEl.style.maxHeight = prevModalMaxHeight;
-    modalEl.style.height = prevModalHeight;
-    modalEl.style.overflow = prevModalOverflow;
-    modalEl.style.width = prevModalWidth;
-    modalEl.style.margin = prevModalMargin;
-
-    if (bodyEl) {
-      bodyEl.style.maxHeight = prevBodyMaxHeight;
-      bodyEl.style.overflow = prevBodyOverflow;
-    }
-
-    if (closeBtn) closeBtn.style.display = prevCloseDisplay;
-    if (footerEl) footerEl.style.display = prevFooterDisplay;
-
-    if (shouldCloseAfter) {
-      payslipModalOpen.value = false;
-    }
-  }
-};
-
-const formatMoney = (value: number) => {
-  return `₩${value.toLocaleString()}`;
-};
+// 금액 포맷 (₩표기 + 3자리 끊어서)
+const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 </script>
 
 <style scoped>
@@ -439,36 +326,6 @@ const formatMoney = (value: number) => {
 .btn-secondary {
   background-color: #eef2ff;
   color: #374151;
-}
-
-.summary-cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.summary-card {
-  background-color: #ffffff;
-  border-radius: 16px;
-  padding: 16px 18px;
-  border: 1px solid #e5e7eb;
-}
-
-.summary-label {
-  font-size: 13px;
-  color: inherit;
-}
-
-.summary-value {
-  margin-top: 6px;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.summary-caption {
-  margin-top: 4px;
-  font-size: 12px;
-  opacity: 0.9;
 }
 
 .pay-detail {
@@ -561,155 +418,15 @@ const formatMoney = (value: number) => {
   font-weight: 600;
 }
 
-.pay-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(135deg, #0f172a, #1f2937);
-  color: #ffffff;
-  border-radius: 20px;
-  padding: 18px 24px;
-}
-
-.footer-caption {
-  font-size: 13px;
-  opacity: 0.9;
-}
-
-.footer-value {
-  font-size: 20px;
-  font-weight: 700;
-  margin-top: 4px;
-}
-
-.footer-subcaption {
-  font-size: 12px;
-  margin-top: 2px;
-}
-
-.footer-account {
-  text-align: right;
-}
-
-.footer-account-label {
-  font-size: 12px;
-  opacity: 0.9;
-  margin-bottom: 2px;
-}
-
-.footer-account-bank {
-  font-weight: 600;
-}
-
-.footer-account-number,
-.footer-account-holder {
-  font-size: 13px;
-}
-
-/* 모달 / 명세서 */
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(15, 23, 42, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 40;
-}
-
-.modal {
-  background-color: #ffffff;
-  border-radius: 16px;
-  width: 520px;
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.modal-header {
-  padding: 14px 20px;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.payslip-body {
-  padding: 16px 20px;
-  overflow-y: auto;
-}
-
-.payslip-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.payslip-month {
-  font-weight: 600;
-}
-
-.payslip-section {
+.work-empty-note {
   margin-top: 12px;
+  font-size: 12px;
+  color: #9ca3af;
+  line-height: 1.4;
 }
 
-.payslip-table {
-  margin-top: 8px;
-  border-radius: 8px;
-}
-
-.payslip-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 2px;
-  font-size: 13px;
-}
-
-.payslip-row--deduction span:last-child {
-  color: #b91c1c;
-}
-
-.payslip-row--total {
-  border-top: 1px dashed #e5e7eb;
-  margin-top: 4px;
-  padding-top: 6px;
-  font-weight: 600;
-}
-
-.payslip-section--net {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 16px;
-  padding-top: 10px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.payslip-net {
-  color: #1d4ed8;
-  font-weight: 700;
-}
-
-.modal-footer {
-  padding: 12px 20px;
-  border-top: 1px solid #e5e7eb;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-/* 계좌 / 실수령 메타 섹션 */
 .pay-meta {
   display: block;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
@@ -718,39 +435,6 @@ const formatMoney = (value: number) => {
   border-radius: 16px;
   border: 1px solid #e5e7eb;
   padding: 16px 20px;
-}
-
-.pay-meta-bank {
-  font-weight: 600;
-  margin-bottom: 2px;
-}
-
-.pay-meta-number,
-.pay-meta-holder {
-  font-size: 13px;
-  color: #4b5563;
-}
-
-.pay-meta-net {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-.pay-meta-caption {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.btn-link {
-  margin-top: 10px;
-  padding: 0;
-  border: none;
-  background: none;
-  color: #2563eb;
-  font-size: 13px;
-  cursor: pointer;
-  text-decoration: underline;
 }
 
 .pay-meta-card--full {
@@ -763,7 +447,6 @@ const formatMoney = (value: number) => {
 
 .pay-meta-row {
   display: flex;
-  /* justify-content: space-between; */
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #f5f5f5;
@@ -786,6 +469,12 @@ const formatMoney = (value: number) => {
 
 .btn-link {
   margin-left: auto;
-  font-size: 14px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>

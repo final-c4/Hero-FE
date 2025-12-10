@@ -1,229 +1,303 @@
-
+<!-- 
+  <pre>
+  Vue Name   : TheHeader.vue
+  Description : 상단 공통 헤더 컴포넌트
+ 
+  History
+  2025/11/28 - 승건 최초 작성
+  2025/12/02 - 동근 헤더 레이아웃 및 스타일링 수정 & js->ts 변환
+  2025/12/08 - 승민 헤더 레이아웃 디자인 최종 수정
+  2025/12/09 - 동근 로고 클릭 시 대시보드 이동 기능 추가, 로그인 세션 남은 시간 표시 & JSDoc 추가
+  </pre>
+ 
+  @author 동근
+  @version 1.3
+ -->
 <template>
-  <header class="header">
-    <div class="header__left">
-      <RouterLink to="/" class="header__banner-link">
-     
-      <img
-        src="/images/logo-hero.png"
-        alt="HERO - Human Employee Resources Operation"
-        class="header__logo-banner"
-      />
-
-      
-      <div class="header__brand">
-        <div class="header__brand-main">
-          <span class="header__brand-main--primary">HE</span>
-          <span class="header__brand-main--accent">RO</span>
-        </div>
-        <div class="header__brand-sub">
-          Human Employee Resources Operation
-        </div>
-      </div>
-      </RouterLink>
-    </div>
-
-    <!-- 알림 버튼 (후에 코딩)-->
-    <div class="header__right">
-      <button class="header__icon-btn" aria-label="알림">
-        🔔
-      </button>
-
-      <!-- 로그인 세션 -->
-    <div class="header__session-box">
-      <div class="session-box__label">로그인 세션</div>
-        <div class="session-box__value">
-          <span class="session-box__clock">🕒</span>
-      <span class="session-time">{{ formattedTime }}</span>
+  <div class="header-container">
+    <!-- 로고영역 : 클릭 시 대시보드 페이지로 이동 -->
+    <div class="logo-area" @click="goDashboard">
+      <div class="logo-box">
+        <img class="logo" src="/images/logo.png" />
       </div>
     </div>
 
-    <!-- 로그인 회원 (후에 코딩) -->
-      <div class="header__user">
-        <div class="header__user-avatar">K</div>
-        <div class="header__user-info">
-          <div class="header__user-name">김히어로 대리</div>
-          <div class="header__user-role">애플리케이션 개발 3팀</div>
+    <!-- 우측 영역 : 알림, 로그인 세션, 프로필 정보  -->
+    <div class="right-area">
+      <div class="right-content">
+        <div class="icon-box">
+          <div class="folder-wrap">
+            <div class="folder-icon">
+              <img class="alarm" src="/images/alarm.png" />
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 로그인 세션 타이머 -->
+        <div class="session-box">
+          <div class="session-title">로그인 세션</div>
+          <div class="session-time">
+            <div class="clock-icon">
+              <img class="clock" src="/images/clock.png"/>
+            </div>
+            <div class="time-text">{{ formattedTime }}</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- 사용자 프로필 정보 -->
+        <div class="profile-box">
+          <div class="profile-icon">K</div>
+          <div class="profile-info">
+            <!-- 현재 하드 코딩해서 사용중, 후에 변경-->
+            <div class="profile-name">김히어로 대리</div>
+            <div class="profile-team">애플리케이션 개발3팀</div>
+          </div>
+          <div class="arrow-box">
+            <img class="arrow-icon" src="/images/dropdownArrow.png" />
+          </div>
         </div>
       </div>
     </div>
-  </header>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { useSessionStore } from "@/stores/session";
+import { computed } from 'vue';
+import { useSessionStore } from '@/stores/session';
+import { useRouter } from 'vue-router';
 
-const session = useSessionStore();
+const router = useRouter();
+const session = useSessionStore(); // 로그인 세션 관리하는 Pinia 스토어
 
-// 남은 세션 시간
+// 메인 로고 버튼 클릭 시 대시보드 이동
+const goDashboard = () => {
+  router.push('/');
+};
+
+// 남은 세션 시간 포맷팅 (MM:SS)
 const formattedTime = computed(() => {
-  const m = Math.floor(session.remainingSeconds / 60)
+  const minutes = Math.floor(session.remainingSeconds / 60)
     .toString()
-    .padStart(2, "0");
-  const s = (session.remainingSeconds % 60).toString().padStart(2, "0");
-  return `${m}:${s}`;
+    .padStart(2, '0');
+  const seconds = (session.remainingSeconds % 60).toString().padStart(2, '0');
+  return `${minutes}:${seconds}`;
 });
+
 </script>
 
 <style scoped>
-.header {
-  height: 75px;
-  padding: 0px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
+.header-container {
+  align-self: stretch;
+  height: 55px;
+  background: white;
+  border-bottom: 2px #E2E8F0 solid;
   justify-content: space-between;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
-
-.header__left {
-  display: flex;
   align-items: center;
-  gap: 6px;
+  display: inline-flex;
 }
 
-
-.header__logo-banner {
-  width: 44px;          
-  margin-left :20px;
-  height: 44px;           
-  object-fit: contain;
-}
-
-
-.header__brand {
-  display: flex;
-  flex-direction: column;
+.logo-area {
+  width: 230px;
+  align-self: stretch;
+  padding: 7px 15px;
+  border-right: 2px #E2E8F0 solid;
+  display: inline-flex;
   justify-content: center;
-  line-height: 1.2;
-}
-
-.header__brand-main {
-  margin-left:32px;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-
-.header__brand-main--primary {
-  color: #1f2937;         
-}
-
-
-.header__brand-main--accent {
-  color: #7ac143;         
-}
-
-
-.header__brand-sub {
-  margin-top: 0;
-  font-size: 8px;
-  color: #6b7280;
-}
-
-
-.header__right {
-  padding : 0 32px;
-  display: flex;
   align-items: center;
-  gap: 16px;
-}
-
-.header__icon-btn {
-  margin-right:8px;
-  border: none;
-  background: #f3f4ff;
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
-  font-size: 16px;
 }
 
-.header__icon-btn:hover {
-  background: #e5edff;
-}
-
-.header__user {
-  display: flex;
+.logo-box {
+  flex: 1;
+  display: inline-flex;
+  justify-content: center;
   align-items: center;
   gap: 10px;
-  padding: 4px;
-  padding-right:10px;
-  border-radius: 999px;
-  background-color: #FFFFFF;
 }
 
-.header__user-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #06336f, #16a34a);
-  color: #ffffff;
-  display: flex;
-  align-items: center;
+.logo {
+  width: 120px;
+  padding: 10px;
+}
+
+.logo-right {
+  width: 146.36px;
+  padding: 10px;
+}
+
+.right-area {
+  width: 440px;
+  padding: 0px;
+  display: inline-flex;
   justify-content: center;
-  font-weight: 600;
+  align-items: center;
 }
 
-.header__user-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.header__user-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: #111827;
-}
-
-.header__user-role {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.header__banner-link {
+.right-content {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  text-decoration: none;
+  gap: 15px;
 }
 
-
-.header__banner-link:hover {
-  opacity: 0.9;
-  cursor: pointer;
-}
-
-.header__session-box {
-  padding: 6px 14px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  display: flex;
+.icon-box {
+  width: 40.5px;
+  padding: 9px;
+  border-radius: 11.25px;
+  display: inline-flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  align-items: flex-end;
+}
+
+.folder-wrap {
+  height: 22.5px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.folder-icon {
+  width: 22.5px;
+  height: 22.5px;
+  position: relative;
+}
+
+.folder-line1 {
+  width: 3.25px;
+  height: 0.94px;
+  position: absolute;
+  left: 9.63px;
+  top: 19.69px;
+  outline: 1.88px #45556C solid;
+}
+
+.folder-line2 {
+  width: 16.87px;
+  height: 14.06px;
+  position: absolute;
+  left: 2.81px;
+  top: 1.88px;
+  outline: 1.88px #45556C solid;
+}
+
+.divider {
+  width: 1px;
+  height: 36px;
+  background: #E2E8F0;
+}
+
+.session-box {
+  width: 70px; 
+  height: 40px;
+  padding: 5px 10px;
   background: #F8FAFC;
-  font-size: 12px;
-  color: #6b7280;
+  border-radius: 11.25px;
+  outline: 2px #E2E8F0 solid;
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  justify-content: center;
+  align-items: center;
+}
+
+.session-title {
+  color: #62748E;
+  font-size: 8px;
+  font-weight: 600;
+  text-align: right;
+  line-height: 12px; 
+  margin-bottom: 2px;
 }
 
 .session-time {
-  font-weight: 700;
-  color: #1f2937;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-end; 
 }
 
-.session-box__clock{
-  margin-right: 6px;
+.clock-icon {
+  width: 18px;
+  height: 18px;
+  position: relative;
+}
+
+.clock-hand {
+  width: 3px;
+  height: 6px;
+  position: absolute;
+  left: 9px;
+  top: 4.5px;
+  outline: 1.5px #1A327C solid;
+}
+
+.clock {
+  width: 17px;
+}
+
+.clock-border {
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  left: 1.5px;
+  top: 1.5px;
+  outline: 1.5px #1A327C solid;
+}
+
+.time-text {
+  font-size: 12px; 
+  color: #1A337D;
+  font-weight: 700;
+}
+
+.profile-box {
+  width: 210px;
+  height: 50px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.profile-icon {
+  width: 40.5px;
+  height: 40.5px;
+  background: linear-gradient(135deg, #1C398E 0%, #162456 100%);
+  border-radius: 11.25px;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile-info {
+  flex: 1;
+  width: 35px;
+  height: 35px;
+}
+
+.profile-name {
+  color: #1C398E;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profile-team {
+  color: #62748E;
+  font-size: 13px;
+}
+
+.arrow-box {
+  display: flex;
+  align-items: center;
+}
+
+.arrow-icon {
+  width: 20px;
+  height: 15px;
 }
 </style>

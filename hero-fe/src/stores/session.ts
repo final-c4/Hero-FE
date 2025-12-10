@@ -1,3 +1,24 @@
+/**
+ * <pre>
+ * TypeScript Name : session.ts
+ * Description     : 세션 관리용 Pinia Store
+ *
+ * Responsibility
+ *   - 프론트엔드 세션 타이머 관리 (초 단위 카운트다운)
+ *   - 페이지 전환 시 세션 갱신
+ *   - 세션 만료 시 로그아웃 처리(추후 API 연동 예정)
+ *
+ * Note
+ *   - 현재는 콘솔 로그만, 추후 토큰 삭제 & API 기반 로그아웃 구현 예정
+ *
+ * History
+ *   2025/12/10 - 동근 최초 작성 (Pinia + Composition API)
+ * </pre>
+ *
+ * @module session-store
+ * @author 동근
+ * @version 1.0
+ */
 import { defineStore } from "pinia";
 import { ref, onUnmounted } from "vue";
 

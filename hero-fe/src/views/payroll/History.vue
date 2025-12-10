@@ -1,6 +1,24 @@
+<!--
+ * <pre>
+ * Vue Name        : History.vue
+ * Description     : 사원의 내 급여 이력 화면
+ *
+ * 기능
+ *  - 최근 12개월 급여 요약 지표
+ *  - 월별 실수령액 추이 라인 차트
+ *  - 급여 내역(기본급/수당/공제/실수령액) 테이블 조회
+ *
+ * History
+ *   2025/12/09 - 동근 최초 작성
+ * </pre>
+ *
+ * @module payroll-history
+ * @author 동근
+ * @version 1.0
+-->
 <template>
   <div class="pay-history-page">
-
+    <!-- 요약 카드 -->
     <section v-if="history" class="history-cards">
       <div class="summary-card">
         <span class="summary-label">평균 실수령액</span>
@@ -14,37 +32,40 @@
         <span class="summary-label">최저 실수령액</span>
         <p class="summary-value">{{ formatMoney(history.minNetPay) }}</p>
       </div>
-<div class="summary-card">
-    <span class="summary-label">전월 대비 변화율</span>
-    <p
-      class="summary-value"
-      :class="history.monthOverMonthRate >= 0 ? 'rate-up' : 'rate-down'"
-    >
-      <span v-if="history.monthOverMonthRate >= 0">▲</span>
-      <span v-else>▼</span>
-      {{ history.monthOverMonthRate }}%
-    </p>
-  </div>
+      <div class="summary-card">
+        <span class="summary-label">전월 대비 변화율</span>
+        <p
+          class="summary-value"
+          :class="history.monthOverMonthRate >= 0 ? 'rate-up' : 'rate-down'"
+        >
+          <span v-if="history.monthOverMonthRate >= 0">▲</span>
+          <span v-else>▼</span>
+          {{ history.monthOverMonthRate }}%
+        </p>
+      </div>
 
-  <!-- 올해 누적 실수령액 -->
-  <div class="summary-card">
-    <span class="summary-label">올해 누적 실수령액</span>
-    <p class="summary-value">{{ formatMoney(history.ytdNetPay) }}</p>
-  </div>
-      
+      <!-- 올해 누적 실수령액 -->
+      <div class="summary-card">
+        <span class="summary-label">올해 누적 실수령액</span>
+        <p class="summary-value">{{ formatMoney(history.ytdNetPay) }}</p>
+      </div>
     </section>
 
     <!-- 차트 -->
     <section v-if="history" class="history-chart">
       <h2 class="panel-title">급여 추이</h2>
-      <canvas ref="chartRef" height="80"></canvas>
+      <BaseLineChart
+        :labels="chartLabels"
+        :data="chartData"
+        tooltip-label-prefix="실수령액: "
+        :currency="true"
+      />
     </section>
 
     <!-- 테이블 표 -->
     <section v-if="history" class="history-table">
-      
       <h2 class="panel-title">급여 이력</h2>
-      
+
       <table>
         <thead>
           <tr class="table-header">
@@ -67,7 +88,7 @@
       </table>
 
       <p class="history-note">
-        <br/>
+        <br />
         · 급여 이력은 최근 12개월까지 조회 가능합니다. <br />
         · 상세 내역은 각 월의 급여명세서에서 확인하실 수 있습니다.
       </p>
@@ -76,91 +97,37 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed, watch } from 'vue';
+import { onMounted, computed } from 'vue';
 import { usePayrollStore } from '@/stores/payrollStore';
-import { Chart, LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend } from 'chart.js';
+import BaseLineChart from '@/components/charts/BaseLineChart.vue';
 
-Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
-
+// store : loadHistory() -> API 호출
 const store = usePayrollStore();
 const history = computed(() => store.history);
-const chartRef = ref<HTMLCanvasElement | null>(null);
-let chart: Chart | null = null;
 
-const buildChart = () => {
-  if (!chartRef.value || !history.value) return;
-
-  const labels = history.value.chart.map(c => c.salaryMonth);
-  const data = history.value.chart.map(c => c.netPay);
-
-  if (chart) {
-    chart.destroy();
-  }
-
-  chart = new Chart(chartRef.value, {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {
-          label: '실수령액',
-          data,
-          tension: 0.3,
-          fill: false
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-
-       layout: {
-      padding: {
-        left: 10,
-        right: 24,  
-        top: 10,
-        bottom: 10
-      }
-    },
-
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label(context) {
-              const v = context.parsed.y || 0;
-              return `실수령액: ₩${v.toLocaleString()}`;
-            }
-          }
-        }
-      },
-      scales: {
-        y: { ticks: { callback: value => `₩${Number(value).toLocaleString()}` } }
-      }
-    }
-  });
-};
-
+// 컴포넌트 mount 시 급여 이력 데이터 초기 로딩
 onMounted(async () => {
   await store.loadHistory();
-  buildChart();
 });
 
-watch(history, () => {
-  buildChart();
-});
+// 차트용 라벨
+const chartLabels = computed(() =>
+  history.value ? history.value.chart.map((c) => c.salaryMonth) : []
+);
 
-onUnmounted(() => {
-  if (chart) chart.destroy();
-});
+// 차트용 실수령액 데이터
+const chartData = computed(() =>
+  history.value ? history.value.chart.map((c) => c.netPay) : []
+);
 
+// 금액 포맷 (₩표기 + 3자리 끊어서)
 const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 </script>
 
 <style scoped>
 .pay-history-page {
-  padding-top:24px;
-  padding-bottom:40px;
+  padding-top: 24px;
+  padding-bottom: 40px;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -182,7 +149,7 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 .summary-label {
   font-size: 13px;
   color: #6b7280;
-  margin-left:22px;
+  margin-left: 22px;
 }
 
 .summary-value {
@@ -190,15 +157,14 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   margin-bottom: 6px;
   font-size: 18px;
   font-weight: 700;
-  margin-left:12px;
+  margin-left: 12px;
 }
 
 .history-chart {
   background-color: #ffffff;
   border-radius: 16px;
   border: 1px solid #e5e7eb;
-  /* padding: 24px 32px 72px; */
-  padding-bottom:72px;
+  padding-bottom: 72px;
   height: 260px;
   margin-bottom: 24px;
 }
@@ -207,8 +173,7 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   background-color: #ffffff;
   border-radius: 16px;
   border: 1px solid #e5e7eb;
-  padding-bottom:10px;
-  /* padding-top:16px; */
+  padding-bottom: 10px;
 }
 
 .history-table table {
@@ -218,22 +183,13 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   font-size: 13px;
 }
 
-/* 헤더 왼쪽 위 모서리 */
 .history-table thead tr:first-child th:first-child {
-  border-top-left-radius: 5px; 
+  border-top-left-radius: 5px;
 }
 
-/* 헤더 오른쪽 위 모서리 */
 .history-table thead tr:first-child th:last-child {
   border-top-right-radius: 5px;
 }
-
-/* .history-table th,
-.history-table td {
-  padding: 14px 24px;
-  text-align: right;
-  border-bottom: 1px solid #f3f4f6;
-} */
 
 .history-table th {
   text-align: left;
@@ -256,7 +212,6 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   text-align: left;
 }
 
-
 .plus {
   color: #16a34a;
 }
@@ -266,7 +221,7 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 }
 
 .history-note {
-  padding-left:18px;
+  padding-left: 18px;
   margin-top: 12px;
   font-size: 12px;
   color: #6b7280;
@@ -274,7 +229,7 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 
 .history-table th:nth-child(5) {
   text-align: right !important;
-} 
+}
 
 .rate-up {
   color: #16a34a;
@@ -284,24 +239,24 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   color: #dc2626;
 }
 
-.table-header{
+.table-header {
   background-color: #162456;
-  color:white;
+  color: white;
 }
 
-.table-body tr:nth-child(2n){
-  background-color: #E2E8F0;
+.table-body tr:nth-child(2n) {
+  background-color: #e2e8f0;
 }
 
-.table-cell{
-  color:#155DFC;
+.table-cell {
+  color: #155dfc;
 }
 
 .table-body tr td:last-child {
   text-align: right;
 }
 
-.panel-title{
-  padding-left:28px;
+.panel-title {
+  padding-left: 28px;
 }
 </style>

@@ -1,3 +1,17 @@
+<!-- 
+ * <pre>
+ * Vue Name : BankAccountModal.vue
+ * Description     : 내 급여 -> 계좌 관리 모달창
+ *
+ *
+ * History
+ *   2025/12/09 - 동근 최초 작성
+ * </pre>
+ *
+ * @module payroll-account-modal
+ * @author 동근
+ * @version 1.0
+ -->
 <template>
   <Teleport to="body">
     <div
@@ -28,6 +42,7 @@
                   () => {
                     selectedAccountId = acc.id;
                     isAddingNew = false;
+                    editingAccountId = null;
                   }
                 "
               >
@@ -45,9 +60,27 @@
                     </p>
                   </div>
                 </div>
+                <div class="account-item-right">
                 <span v-if="acc.isPrimary" class="account-badge">
                   급여 수령 계좌
                 </span>
+                  <div class="account-item-actions">
+                  <button
+                  type="button"
+                  class="account-item-action"
+                  @click.stop="startEdit(acc)"
+                  >
+                  수정
+                  </button>
+                  <button
+                  type="button"
+                  class="account-item-action account-item-action--danger"
+                  @click.stop="deleteAccount(acc.id)"
+                  >
+                  삭제
+                  </button>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>
@@ -63,7 +96,7 @@
                 class="btn-link-small"
                 @click="toggleNewAccount"
               >
-                {{ isAddingNew ? '새 계좌 입력 취소' : '새 계좌 입력하기' }}
+                {{ isAddingNew ? (editingAccountId ? '계좌 수정 취소' : '새 계좌 입력 취소') : '새 계좌 입력하기' }}
               </button>
             </div>
 
@@ -115,9 +148,15 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { usePayrollStore } from '@/stores/payrollStore';
-// 타입 정의는 프로젝트 구조에 맞게 조정해줘
 import type { BankAccount, MyPaySummary } from '@/types/payroll';
 
+/**
+ * props 설명
+ * open - 모달 열림 여부
+ * accounts - 현재 사원의 계좌 목록
+ * summary - 현재 조회 중인 급여 요약 정보
+ * selectedMonth - 현재 선택된 급여 월 (YYYY-MM)
+ */
 const props = defineProps<{
   open: boolean;
   accounts: BankAccount[];
@@ -125,14 +164,39 @@ const props = defineProps<{
   selectedMonth: string;
 }>();
 
+
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void;
   (e: 'saved'): void;
 }>();
 
+
+const startEdit = (acc: BankAccount) => {
+  isAddingNew.value = true;
+  editingAccountId.value = acc.id;
+  accountForm.value = {
+    bankCode: acc.bankName,
+    accountNumber: acc.accountNumber,
+    accountHolder: acc.accountHolder
+  };
+};
+
+const deleteAccount = async (id: number) => {
+  try {
+    if (!confirm('해당 계좌를 삭제하시겠습니까?')) return;
+
+    await store.deleteMyBankAccount(id);
+
+    emit('saved');
+  } catch (e) {
+    console.error('계좌 삭제 실패', e);
+  }
+};
+
 const store = usePayrollStore();
 
 const selectedAccountId = ref<number | null>(null);
+const editingAccountId = ref<number | null>(null);
 const isAddingNew = ref(false);
 const accountForm = ref({
   bankCode: '',
@@ -145,7 +209,6 @@ watch(
   () => props.open,
   (val) => {
     if (!val) return;
-
     // summary 기준으로 현재 계좌 찾기
     if (props.summary) {
       const current = props.accounts.find(
@@ -162,7 +225,9 @@ watch(
       selectedAccountId.value = primary ? primary.id : null;
     }
 
+// 모달 열릴때 초기화 로직 수정
     isAddingNew.value = false;
+    editingAccountId.value = null;
     accountForm.value = {
       bankCode: '',
       accountNumber: '',
@@ -176,9 +241,11 @@ const close = () => {
   emit('update:open', false);
 };
 
+// 새 계좌 입력/수정 폼 열기/닫기 토글
 const toggleNewAccount = () => {
   isAddingNew.value = !isAddingNew.value;
   if (!isAddingNew.value) {
+    editingAccountId.value = null;
     accountForm.value = {
       bankCode: '',
       accountNumber: '',
@@ -187,20 +254,44 @@ const toggleNewAccount = () => {
   }
 };
 
+// 계좌 저장 처리
 const saveAccount = async () => {
   try {
-    let targetAccountId = selectedAccountId.value;
-
-    // 새 계좌 추가 모드
-    if (isAddingNew.value) {
+  //  기존 계좌 수정
+    if (isAddingNew.value && editingAccountId.value != null) {
       if (
         !accountForm.value.bankCode.trim() ||
         !accountForm.value.accountNumber.trim() ||
         !accountForm.value.accountHolder.trim()
       ) {
-        // TODO: 에러 토스트 띄우고 싶으면 여기서 처리
         return;
       }
+         if (!confirm('계좌 정보를 수정하시겠습니까?')) return;
+      await store.updateMyBankAccount(editingAccountId.value, {
+        bankCode: accountForm.value.bankCode.trim(),
+        accountNumber: accountForm.value.accountNumber.trim(),
+        accountHolder: accountForm.value.accountHolder.trim()
+      });
+
+      emit('saved'); 
+      
+      isAddingNew.value = false;
+      editingAccountId.value = null;
+
+      return;
+    }
+
+    // 신규 계좌 추가
+    if (isAddingNew.value && editingAccountId.value == null) {
+      if (
+        !accountForm.value.bankCode.trim() ||
+        !accountForm.value.accountNumber.trim() ||
+        !accountForm.value.accountHolder.trim()
+      ) {
+        return;
+      }
+
+      if (!confirm('새 계좌를 등록하시겠습니까? (대표계좌로 등록)')) return;
 
       const newAcc = await store.addMyBankAccount({
         bankCode: accountForm.value.bankCode.trim(),
@@ -208,15 +299,24 @@ const saveAccount = async () => {
         accountHolder: accountForm.value.accountHolder.trim()
       });
 
-      targetAccountId = newAcc.id;
+      // 새 계좌를 대표 계좌로 설정
+      await store.setPrimaryBankAccount(newAcc.id);
+
+      emit('saved');
+      emit('update:open', false);
+      return;
     }
 
-    if (targetAccountId != null) {
-      await store.setPrimaryBankAccount(targetAccountId);
-    }
+//  폼 안 쓰고 대표 계좌만 변경 (라디오 선택 후 저장)
+    if (!isAddingNew.value && selectedAccountId.value != null) {
+        if (!confirm('이 계좌를 대표 계좌로 설정하시겠습니까?')) return;
 
-    emit('saved');        // 부모에게 "저장 끝났어" 알림
-    emit('update:open', false); // 모달 닫기
+      await store.setPrimaryBankAccount(selectedAccountId.value);
+      
+      emit('saved');
+      emit('update:open', false);
+      return;
+    }
   } catch (e) {
     console.error('계좌 정보 저장 실패', e);
   }
@@ -224,7 +324,6 @@ const saveAccount = async () => {
 </script>
 
 <style scoped>
-/* 모달 스타일 – 기존 것 재사용 */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -394,7 +493,6 @@ const saveAccount = async () => {
   font-size: 13px;
 }
 
-/* 버튼 공통 – 페이지에서 쓰는 클래스 재사용용 */
 .btn-primary,
 .btn-secondary {
   border-radius: 999px;
@@ -412,5 +510,30 @@ const saveAccount = async () => {
 .btn-secondary {
   background-color: #eef2ff;
   color: #374151;
+}
+
+.account-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.account-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.account-item-action {
+  border: none;
+  background: none;
+  font-size: 11px;
+  color: #123c9c;
+  cursor: pointer;
+  padding: 0;
+}
+
+.account-item-action--danger {
+  color: #b91c1c;
 }
 </style>
