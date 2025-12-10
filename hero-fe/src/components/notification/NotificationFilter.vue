@@ -42,27 +42,42 @@
   </div>
 </template>
 
-<script setup>
-// Props 정의
-defineProps({
-  tabs: {
-    type: Array,
-    required: true,
-    // 탭 목록: [{ id: 'all', label: '전체', count: 5 }, ...]
-  },
-  activeTab: {
-    type: String,
-    required: true,
-    // 현재 활성화된 탭 ID
-  }
-});
+<script setup lang="ts">
+// 1. 타입 정의
+/**
+ * 탭 객체 타입
+ * @property {string} id - 탭 고유 ID
+ * @property {string} label - 탭 표시 라벨
+ * @property {number} count - 해당 탭의 알림 개수
+ */
+interface Tab {
+  id: string;
+  label: string;
+  count: number;
+}
 
-// Emits 정의
-defineEmits(['update:activeTab', 'markAllRead']);
-// update:activeTab: 탭 변경 이벤트 (v-model 양방향 바인딩)
-// markAllRead: 모든 알림 읽음 처리 이벤트
+// 2. Props 정의
+/**
+ * Props
+ * @property {Tab[]} tabs - 탭 목록 배열
+ * @property {string} activeTab - 현재 활성화된 탭 ID
+ */
+const props = defineProps<{
+  tabs: Tab[];
+  activeTab: string;
+}>();
+
+// 3. Emits 정의
+/**
+ * Emits
+ * @event update:activeTab - 탭 변경 이벤트 (v-model 양방향 바인딩)
+ * @event markAllRead - 모든 알림 읽음 처리 이벤트
+ */
+const emit = defineEmits<{
+  'update:activeTab': [id: string];  // 탭 ID를 전달
+  'markAllRead': [];                 // 인자 없음
+}>();
 </script>
-
 <style scoped>
 /* 필터 섹션 컨테이너 */
 .filter-section {

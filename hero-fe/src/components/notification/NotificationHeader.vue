@@ -44,19 +44,16 @@
     </div>
   </div>
 </template>
-
-<script setup>
+]
+<script setup lang="ts">
 // 1. Props 정의
 /**
  * Props
  * @property {number} unreadCount - 읽지 않은 알림 개수
  */
-const props = defineProps({
-  unreadCount: {
-    type: Number,
-    default: 0
-  }
-});
+const props = defineProps<{
+  unreadCount: number;
+}>();
 
 // 2. Emits 정의
 /**
@@ -64,11 +61,14 @@ const props = defineProps({
  * @event back - 뒤로가기 버튼 클릭
  * @event settings - 설정 버튼 클릭
  */
-const emit = defineEmits(['back', 'settings']);
+const emit = defineEmits<{
+  back: [];      // 인자 없음
+  settings: [];  // 인자 없음
+}>();
 </script>
 
 <style scoped>
-/* ===== 헤더 영역 ===== */
+/* 헤더 영역 */
 .header {
   background: white;
   border-bottom: 1px solid #E2E8F0;

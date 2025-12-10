@@ -29,7 +29,7 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 // Props, Emits, Composables가 필요 없는 정적 컴포넌트
 </script>
 
