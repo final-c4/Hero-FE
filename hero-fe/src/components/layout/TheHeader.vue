@@ -7,10 +7,11 @@
  2025/12/08 (동근) 최초 작성 
  2025/12/09 (승민) 헤더 사이즈 조정
  2025/12/10 (혜원) 알림 페이지 라우팅 기능 추가
+ 2025/12/11 (승건) 프로필 드롭다운 및 로그아웃 기능 추가
  </pre>
  
  @author 동근
- @version 1.2 
+ @version 1.3
  -->
 
 <template>
@@ -46,14 +47,21 @@
 
         <div class="divider"></div>
 
-        <div class="profile-box">
-          <div class="profile-icon">K</div>
-          <div class="profile-info">
-            <div class="profile-name">김히어로 대리</div>
-            <div class="profile-team">애플리케이션 개발3팀</div>
+        <div v-if="user" class="profile-container">
+          <div class="profile-box" @click="toggleDropdown">
+            <div class="profile-icon">{{ user.employeeName?.charAt(0) }}</div>
+            <div class="profile-info">
+              <div class="profile-name">{{ user.employeeName }} {{ user.gradeName }}</div>
+              <div class="profile-team">{{ user.departmentName }}</div>
+            </div>
+            <div class="arrow-box">
+              <img class="arrow-icon" :class="{ 'rotate': isDropdownOpen }" src="/images/dropdownArrow.png" />
+            </div>
           </div>
-          <div class="arrow-box">
-            <img class="arrow-icon" src="/images/dropdownArrow.png" />
+          <!-- 드롭다운 메뉴 -->
+          <div v-if="isDropdownOpen" class="profile-dropdown">
+            <div class="dropdown-item" @click="goToMyPage">마이페이지</div>
+            <div class="dropdown-item" @click="handleLogout">로그아웃</div>
           </div>
         </div>
       </div>
@@ -62,13 +70,41 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 const router = useRouter()
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
+
+const isDropdownOpen = ref(false);
 
 const goToNotifications = () => {
   router.push('/notifications')
 }
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const goToMyPage = () => {
+  // TODO: 마이페이지 라우트가 정의되면 활성화
+  // router.push('/my-page');
+  console.log('마이페이지로 이동');
+  isDropdownOpen.value = false; // 클릭 후 드롭다운 닫기
+};
+
+const handleLogout = async () => {
+  // 스토어의 logout 액션을 호출하고 완료될 때까지 기다립니다.
+  await authStore.logout();
+
+  isDropdownOpen.value = false; // 클릭 후 드롭다운 닫기
+
+  // 상태가 모두 초기화된 후, 로그인 페이지로 이동합니다.
+  router.push('/login');
+};
 </script>
 
 <style scoped>
@@ -133,6 +169,10 @@ const goToNotifications = () => {
   align-items: flex-end;
   cursor: pointer; /* 알림 클릭 가능하다는 표시 */
   transition: background-color 0.2s; /* 알림을 위한 부드러운 효과 */
+}
+
+.profile-container {
+  position: relative; /* 드롭다운 메뉴의 기준점 */
 }
 
 /* 알림 호버 효과 추가 */
@@ -248,6 +288,10 @@ const goToNotifications = () => {
   display: flex;
   gap: 10px;
   align-items: center;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 12px;
+  transition: background-color 0.2s;
 }
 
 .profile-icon {
@@ -288,5 +332,39 @@ const goToNotifications = () => {
 .arrow-icon {
   width: 20px;
   height: 15px;
+}
+
+.arrow-icon.rotate {
+  transform: rotate(180deg);
+}
+
+.arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 100%; /* profile-box 바로 아래에 위치 */
+  right: 0;
+  margin-top: 8px;
+  width: 160px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f3f5;
 }
 </style>
