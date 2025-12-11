@@ -1,19 +1,3 @@
-<!-- 
-  <pre>
-  (File => TypeScript / Vue) Name   : Correction.vue
-  Description : 근태 기록 수정 이력 페이지
-                - 상단 요약 카드로 이번 달 근무 현황 요약
-                - 탭으로 근태 관련 4개 화면 간 이동
-                - 기간 필터 + 페이지네이션을 사용한 근태 기록 수정 이력 조회
-
-  History
-  2025/12/10 - 이지윤 최초 작성
-  </pre>
-
-  @author 이지윤
-  @version 1.0
--->
-
 <template>
   <div class="attendance-wrapper">
     <div class="attendance-page">
@@ -88,7 +72,7 @@
           </RouterLink>
         </div>
 
-        <!-- 검색 영역 -->
+        <!-- 검색 영역 (기간 필터 UI) -->
         <div class="panel-search">
           <div class="panel-search-inner">
             <!-- 기간(시작) -->
@@ -132,31 +116,27 @@
               <thead>
                 <tr>
                   <th>날짜</th>
-                  <th>수정 전 출근 시간</th>
-                  <th>수정 전 퇴근 시간</th>
-                  <th>수정 후 출근 시간</th>
-                  <th>수정 후 퇴근 시간</th>
+                  <th>근무제 이름</th>
+                  <th>출근시간</th>
+                  <th>퇴근시간</th>
                   <th>사유</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="(row, index) in correctionStore.correctionList"
-                  :key="row.correctionId"
+                  v-for="(row, index) in changeLogList"
+                  :key="row.id"
                   :class="{ 'row-striped': index % 2 === 1 }"
                 >
                   <td>{{ row.date }}</td>
-                  <td class="time-cell">
-                    {{ formatTime(row.prevStartTime) }}
+                  <td class="worksystem-name">
+                    {{ row.workSystemName }}
                   </td>
                   <td class="time-cell">
-                    {{ formatTime(row.prevEndTime) }}
+                    {{ formatTime(row.startTime) }}
                   </td>
-                  <td class="time-cell changed-time">
-                    {{ formatTime(row.newStartTime) }}
-                  </td>
-                  <td class="time-cell changed-time">
-                    {{ formatTime(row.newEndTime) }}
+                  <td class="time-cell">
+                    {{ formatTime(row.endTime) }}
                   </td>
                   <td>{{ row.reason }}</td>
                 </tr>
@@ -164,36 +144,13 @@
             </table>
           </div>
 
-          <!-- 페이지네이션 UI -->
+          <!-- 페이지네이션 (지금은 더미, 동작 없음) -->
           <div class="pagination">
-            <!-- 이전 -->
-            <button
-              class="page-button"
-              :disabled="currentPage === 1"
-              @click="goPage(currentPage - 1)"
-            >
-              이전
-            </button>
-
-            <!-- 숫자 버튼 -->
-            <button
-              v-for="page in totalPages"
-              :key="page"
-              class="page-button"
-              :class="{ 'page-active': page === currentPage }"
-              @click="goPage(page)"
-            >
-              {{ page }}
-            </button>
-
-            <!-- 다음 -->
-            <button
-              class="page-button"
-              :disabled="currentPage === totalPages"
-              @click="goPage(currentPage + 1)"
-            >
-              다음
-            </button>
+            <button class="page-button">이전</button>
+            <button class="page-button page-active">1</button>
+            <button class="page-button">2</button>
+            <button class="page-button">3</button>
+            <button class="page-button">다음</button>
           </div>
         </div>
       </div>
@@ -201,104 +158,91 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+<script lang="ts" setup>
+import { RouterLink, useRoute } from 'vue-router'
+import { ref } from 'vue'
 
-import { useCorrectionStore } from '@/stores/attendance/correction';
+const route = useRoute()
+const isActiveTab = (name: string) => route.name === name
 
-const route = useRoute();
-const correctionStore = useCorrectionStore();
+// 기간 필터 인풋 (지금은 UI만)
+const startDate = ref('')
+const endDate = ref('')
 
-/**
- * 현재 활성화된 탭인지 확인합니다.
- *
- * @param {string} name - 라우트 이름 (예: 'AttendanceCorrection')
- * @returns {boolean} 활성 탭 여부
- ****************************************
- * @param → 함수의 인자(Parameter)
- ****************************************
- */
-const isActiveTab = (name: string): boolean => {
-  return route.name === name;
-};
+// 한 행 타입
+interface WorkSystemChangeRow {
+  id: number
+  date: string
+  workSystemName: string
+  startTime: string
+  endTime: string
+  reason: string
+}
 
-// 기간 인풋 (조회 조건)
-const startDate = ref<string>('');
-const endDate = ref<string>('');
+// Figma 기준 더미 데이터
+const changeLogList = ref<WorkSystemChangeRow[]>([
+  {
+    id: 1,
+    date: '2025-12-01',
+    workSystemName: '유연근무제',
+    startTime: '09:30',
+    endTime: '18:30',
+    reason: '늦잠',
+  },
+  {
+    id: 2,
+    date: '2025-11-30',
+    workSystemName: '재택근무제',
+    startTime: '09:00',
+    endTime: '18:00',
+    reason: '몸살',
+  },
+  {
+    id: 3,
+    date: '2025-11-29',
+    workSystemName: '유연근무제',
+    startTime: '10:00',
+    endTime: '17:00',
+    reason: '교통체증',
+  },
+  {
+    id: 4,
+    date: '2025-11-28',
+    workSystemName: '유연근무제',
+    startTime: '10:00',
+    endTime: '19:00',
+    reason: '야근',
+  },
+  {
+    id: 5,
+    date: '2025-11-27',
+    workSystemName: '재택근무제',
+    startTime: '09:00',
+    endTime: '18:00',
+    reason: '독감',
+  },
+])
 
-// 페이지네이션 바인딩용 (store 값 그대로 사용)
-const currentPage = computed(() => correctionStore.currentPage);
-const totalPages = computed(() => correctionStore.totalPages);
+// 검색 버튼 (지금은 콘솔만, 나중에 백엔드 연동 시 로직 교체)
+function onSearch() {
+  console.log('근무제 변경 이력 검색 클릭 (아직 필터 로직 없음)', {
+    startDate: startDate.value,
+    endDate: endDate.value,
+  })
+}
 
-/**
- * 근태 기록 수정 이력 페이지 진입 시 초기화 로직입니다.
- * - 기존에 설정된 필터(startDate, endDate)가 있다면 인풋에 반영
- * - 1 페이지 데이터를 조회합니다.
- */
-onMounted(() => {
-  startDate.value = correctionStore.startDate || '';
-  endDate.value = correctionStore.endDate || '';
+// 초기화 버튼
+function onReset() {
+  startDate.value = ''
+  endDate.value = ''
+}
 
-  correctionStore.fetchCorrections(1);
-});
-
-/**
- * 검색 버튼 클릭 시 실행되는 핸들러입니다.
- * - 기간 필터(startDate, endDate)를 스토어에 반영한 뒤
- *   1 페이지부터 근태 기록 수정 이력을 다시 조회합니다.
- */
-const onSearch = (): void => {
-  correctionStore.setFilterDates(startDate.value, endDate.value);
-  correctionStore.fetchCorrections(1);
-};
-
-/**
- * 초기화 버튼 클릭 시 실행되는 핸들러입니다.
- * - 기간 필터를 초기화하고
- *   1 페이지부터 근태 기록 수정 이력을 다시 조회합니다.
- */
-const onReset = (): void => {
-  startDate.value = '';
-  endDate.value = '';
-
-  correctionStore.resetFilters();
-  correctionStore.fetchCorrections(1);
-};
-
-/**
- * 페이지를 이동합니다.
- * - 1 페이지보다 작거나 총 페이지 수를 초과하는 경우 이동하지 않습니다.
- *
- * @param {number} page - 이동할 페이지 번호
- */
-const goPage = (page: number): void => {
-  const maxPage = totalPages.value || 1;
-
-  if (page < 1 || page > maxPage) {
-    return;
-  }
-
-  correctionStore.fetchCorrections(page);
-};
-
-/**
- * 시간 문자열을 'HH:mm' 형식으로 변환합니다.
- * - 서버에서 '09:00:00' 같은 형식으로 내려오는 값을
- *   '09:00'으로 잘라서 표시합니다.
- *
- * @param {string | null | undefined} time - 시간 문자열
- * @returns {string} 변환된 시간 문자열, 값이 없으면 빈 문자열
- */
-const formatTime = (time?: string | null): string => {
-  if (!time) {
-    return '';
-  }
-
-  return time.length >= 5 ? time.substring(0, 5) : time;
-};
+// "09:00:00" 형식 대응용
+function formatTime(time: string) {
+  if (!time) return ''
+  return time.length >= 5 ? time.substring(0, 5) : time
+}
 </script>
-
 
 
 <style scoped>
@@ -614,3 +558,4 @@ const formatTime = (time?: string | null): string => {
 
 
 </style>
+

@@ -72,10 +72,10 @@ const attendanceRoutes: RouteRecordRaw[] = [
        *     Change_log.vue → ChangeLog.vue 로 변경 권장
        */
       {
-        path: 'attendance_record/change_log',
+        path: 'attendance_record/changeLog',
         name: 'AttendanceChangeLog',
         component: () =>
-          import('@/views/attendance/attendance_record/Change_log.vue'),
+          import('@/views/attendance/attendance_record/ChangeLog.vue'),
         meta: { title: '근무제 변경 이력' },
       },
 
