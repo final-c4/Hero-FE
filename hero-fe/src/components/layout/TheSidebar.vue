@@ -282,7 +282,9 @@ const handleParentClick = (key: string) => {
 const handleSubMenuClick = (key: string) => {
   activeSubMenu.value = key;
   if (key === 'template') {
-    router.push('/evaluationtemplatelist');
+    router.push('/evaluation/template/list');
+  }else if (key === 'guide') {
+    router.push('/evaluation/guide/list');
   } else if (key === 'document-templates') {
     router.push('/approval/document-templates');
   } else if (key === 'inbox') {
