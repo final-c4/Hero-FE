@@ -85,12 +85,12 @@
         </div>
 
         <div v-if="isApprovalOpen && !isCollapsed" class="sub-menu-list">
-          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'form' }"
-               @click="handleSubMenuClick('form')">
+          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'document-templates' }"
+               @click="handleSubMenuClick('document-templates')">
             <div class="sub-menu-text">결재문서서식</div>
           </div>
-          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'archive' }"
-               @click="handleSubMenuClick('archive')">
+          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'inbox' }"
+               @click="handleSubMenuClick('inbox')">
             <div class="sub-menu-text">결재문서함</div>
           </div>
         </div>
@@ -271,7 +271,11 @@ const handleSubMenuClick = (key: string) => {
   if (key === 'template') {
     router.push('/evaluation/template/list');
   }else if (key === 'guide') {
-    router.push('/evaluation/guide/list')
+    router.push('/evaluation/guide/list');
+  } else if (key === 'document-templates') {
+    router.push('/approval/document-templates');
+  } else if (key === 'inbox') {
+    router.push('/approval/inbox');
   }
 };
 
@@ -302,8 +306,6 @@ const handleCollapse = () => {
   width: 230px;
   background: white;
   transition: width 0.3s ease;
-  overflow: hidden;
-
   overflow-y: auto;
   /* IE, Edge (구버전) */
   -ms-overflow-style: none;
