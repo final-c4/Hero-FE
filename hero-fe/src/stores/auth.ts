@@ -74,11 +74,20 @@ export const useAuthStore = defineStore('auth', () => {
      * (설명 : )로그아웃 시 호출되며, 모든 인증 관련 상태를 초기화합니다.
      * @returns {void}
      */
-    function logout() {
-        accessToken.value = null;
-        user.value = null;
-        // 라우팅은 네비게이션 가드에 의해 자동으로 처리되므로 여기서는 상태만 초기화합니다.
-        // 로그아웃 url 신청
+    async function logout() {
+        // 서버에 로그아웃을 요청하여 서버 측 세션/토큰을 무효화합니다.
+        try {
+            const apiClient = (await import('@/api/apiClient')).default;
+            await apiClient.post('/api/auth/logout');
+            console.log('서버 로그아웃 요청 성공');
+        } catch (error) {
+            console.error('서버 로그아웃 요청 실패:', error);
+            // API 요청이 실패하더라도 클라이언트에서는 로그아웃을 계속 진행합니다.
+        } finally {
+            // 클라이언트 측 상태(토큰, 사용자 정보)를 모두 초기화합니다.
+            accessToken.value = null;
+            user.value = null;
+        }
     }
 
     /**
