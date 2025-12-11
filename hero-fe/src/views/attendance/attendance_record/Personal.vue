@@ -15,202 +15,205 @@
 -->
 
 <template>
-  <div class="attendance-page">
-    <!-- 상단 요약 카드 4개 -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="summary-title">이번 달 근무일</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">15</span>
-          <span class="summary-unit">시간</span>
+  <div class="attendance-wrapper">
+    <div class="attendance-page">
+
+      <!-- 상단 요약 카드 4개 -->
+      <div class="summary-cards">
+        <div class="summary-card">
+          <div class="summary-title">이번 달 근무일</div>
+          <div class="summary-value-wrapper">
+            <span class="summary-value">15</span>
+            <span class="summary-unit">시간</span>
+          </div>
+        </div>
+  
+        <div class="summary-card">
+          <div class="summary-title">오늘 근무</div>
+          <div class="summary-value-wrapper">
+            <span class="summary-value">기본근무제</span>
+          </div>
+        </div>
+  
+        <div class="summary-card">
+          <div class="summary-title">이번 달 지각</div>
+          <div class="summary-value-wrapper">
+            <span class="summary-value">2</span>
+            <span class="summary-unit">회</span>
+          </div>
+        </div>
+  
+        <div class="summary-card">
+          <div class="summary-title">이번 달 결근</div>
+          <div class="summary-value-wrapper">
+            <span class="summary-value">0</span>
+            <span class="summary-unit">회</span>
+          </div>
         </div>
       </div>
-
-      <div class="summary-card">
-        <div class="summary-title">오늘 근무</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">기본근무제</span>
+  
+      <!-- 메인 패널 -->
+      <div class="panel">
+        <!-- 상단 탭 (라우터 탭으로 동작) -->
+        <div class="panel-tabs">
+          <!-- 개인 근태 이력 -->
+          <RouterLink
+            :to="{ name: 'AttendancePersonal' }"
+            class="tab tab-left"
+            :class="{ 'tab-active': isActiveTab('AttendancePersonal') }"
+          >
+            개인 근태 이력
+          </RouterLink>
+  
+          <!-- 초과 근무 이력 -->
+          <RouterLink
+            :to="{ name: 'AttendanceOvertime' }"
+            class="tab"
+            :class="{ 'tab-active': isActiveTab('AttendanceOvertime') }"
+          >
+            초과 근무 이력
+          </RouterLink>
+  
+          <!-- 근태 기록 수정 이력 -->
+          <RouterLink
+            :to="{ name: 'AttendanceCorrection' }"
+            class="tab"
+            :class="{ 'tab-active': isActiveTab('AttendanceCorrection') }"
+          >
+            근태 기록 수정 이력
+          </RouterLink>
+  
+          <!-- 근무제 변경 이력 -->
+          <RouterLink
+            :to="{ name: 'AttendanceChangeLog' }"
+            class="tab tab-right"
+            :class="{ 'tab-active': isActiveTab('AttendanceChangeLog') }"
+          >
+            근무제 변경 이력
+          </RouterLink>
         </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-title">이번 달 지각</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">2</span>
-          <span class="summary-unit">회</span>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-title">이번 달 결근</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">0</span>
-          <span class="summary-unit">회</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 메인 패널 -->
-    <div class="panel">
-      <!-- 상단 탭 (라우터 탭으로 동작) -->
-      <div class="panel-tabs">
-        <!-- 개인 근태 이력 -->
-        <RouterLink
-          :to="{ name: 'AttendancePersonal' }"
-          class="tab tab-left"
-          :class="{ 'tab-active': isActiveTab('AttendancePersonal') }"
-        >
-          개인 근태 이력
-        </RouterLink>
-
-        <!-- 초과 근무 이력 -->
-        <RouterLink
-          :to="{ name: 'AttendanceOvertime' }"
-          class="tab"
-          :class="{ 'tab-active': isActiveTab('AttendanceOvertime') }"
-        >
-          초과 근무 이력
-        </RouterLink>
-
-        <!-- 근태 기록 수정 이력 -->
-        <RouterLink
-          :to="{ name: 'AttendanceCorrection' }"
-          class="tab"
-          :class="{ 'tab-active': isActiveTab('AttendanceCorrection') }"
-        >
-          근태 기록 수정 이력
-        </RouterLink>
-
-        <!-- 근무제 변경 이력 -->
-        <RouterLink
-          :to="{ name: 'AttendanceChangeLog' }"
-          class="tab tab-right"
-          :class="{ 'tab-active': isActiveTab('AttendanceChangeLog') }"
-        >
-          근무제 변경 이력
-        </RouterLink>
-      </div>
-
-      <!-- 검색 영역 (기간 필터) -->
-      <div class="panel-search">
-        <div class="panel-search-inner">
-          <!-- 기간(시작) -->
-          <div class="date-filter-group">
-            <span class="date-label">기간(시작)</span>
-            <div class="date-input-wrapper">
-              <input
-                v-model="startDate"
-                type="date"
-                class="date-input"
-              />
-              <span class="date-icon">📅</span>
+  
+        <!-- 검색 영역 (기간 필터) -->
+        <div class="panel-search">
+          <div class="panel-search-inner">
+            <!-- 기간(시작) -->
+            <div class="date-filter-group">
+              <span class="date-label">기간(시작)</span>
+              <div class="date-input-wrapper">
+                <input
+                  v-model="startDate"
+                  type="date"
+                  class="date-input"
+                />
+                <span class="date-icon">📅</span>
+              </div>
+            </div>
+  
+            <!-- 기간(종료) -->
+            <div class="date-filter-group">
+              <span class="date-label">기간(종료)</span>
+              <div class="date-input-wrapper">
+                <input
+                  v-model="endDate"
+                  type="date"
+                  class="date-input"
+                />
+                <span class="date-icon">📅</span>
+              </div>
+            </div>
+  
+            <!-- 검색 / 초기화 버튼 -->
+            <div class="search-button-group">
+              <button class="btn-search" @click="onSearch">검색</button>
+              <button class="btn-reset" @click="onReset">초기화</button>
             </div>
           </div>
-
-          <!-- 기간(종료) -->
-          <div class="date-filter-group">
-            <span class="date-label">기간(종료)</span>
-            <div class="date-input-wrapper">
-              <input
-                v-model="endDate"
-                type="date"
-                class="date-input"
-              />
-              <span class="date-icon">📅</span>
-            </div>
-          </div>
-
-          <!-- 검색 / 초기화 버튼 -->
-          <div class="search-button-group">
-            <button class="btn-search" @click="onSearch">검색</button>
-            <button class="btn-reset" @click="onReset">초기화</button>
-          </div>
         </div>
-      </div>
-
-      <!-- 테이블 영역 -->
-      <div class="panel-table-wrapper">
-        <div class="panel-table">
-          <table class="attendance-table">
-            <thead>
-              <tr>
-                <th>날짜</th>
-                <th>상태</th>
-                <th>출근시간</th>
-                <th>퇴근시간</th>
-                <th>근무시간</th>
-                <th>근무제</th>
-                <th>결재양식 작성</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr
-                v-for="(row, index) in personalList"
-                :key="row.attendanceId"
-                :class="{ 'row-striped': index % 2 === 1 }"
-              >
-                <td>{{ row.workDate }}</td>
-
-                <td>
-                  <span
-                    class="status-pill"
-                    :class="{
-                      'status-normal': row.state === '정상',
-                      'status-late': row.state === '지각'
-                    }"
-                  >
-                    {{ row.state }}
-                  </span>
-                </td>
-
-                <td>{{ formatTime(row.startTime) }}</td>
-                <td>{{ formatTime(row.endTime) }}</td>
-
-                <td>{{ row.workDuration }}</td>
-
-                <td>{{ row.workSystemName }}</td>
-
-                <td>
-                  <button class="link-button">
-                    근태 정정 / 초과 근무 신청
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- 페이지네이션 -->
-        <div class="pagination">
-          <!-- 이전 -->
-          <button
-            class="page-button"
-            :disabled="currentPage === 1"
-            @click="goPage(currentPage - 1)"
-          >
-            이전
-          </button>
-
-          <!-- 숫자 버튼 -->
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            class="page-button"
-            :class="{ 'page-active': page === currentPage }"
-            @click="goPage(page)"
-          >
-            {{ page }}
-          </button>
-
-          <!-- 다음 -->
-          <button
-            class="page-button"
-            :disabled="currentPage === totalPages"
-            @click="goPage(currentPage + 1)"
-          >
-            다음
-          </button>
+  
+        <!-- 테이블 영역 -->
+        <div class="panel-table-wrapper">
+          <div class="panel-table">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>날짜</th>
+                  <th>상태</th>
+                  <th>출근시간</th>
+                  <th>퇴근시간</th>
+                  <th>근무시간</th>
+                  <th>근무제</th>
+                  <th>결재양식 작성</th>
+                </tr>
+              </thead>
+  
+              <tbody>
+                <tr
+                  v-for="(row, index) in personalList"
+                  :key="row.attendanceId"
+                  :class="{ 'row-striped': index % 2 === 1 }"
+                >
+                  <td>{{ row.workDate }}</td>
+  
+                  <td>
+                    <span
+                      class="status-pill"
+                      :class="{
+                        'status-normal': row.state === '정상',
+                        'status-late': row.state === '지각'
+                      }"
+                    >
+                      {{ row.state }}
+                    </span>
+                  </td>
+  
+                  <td>{{ formatTime(row.startTime) }}</td>
+                  <td>{{ formatTime(row.endTime) }}</td>
+  
+                  <td>{{ row.workDuration }}</td>
+  
+                  <td>{{ row.workSystemName }}</td>
+  
+                  <td>
+                    <button class="link-button">
+                      근태 정정 / 초과 근무 신청
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <!-- 페이지네이션 -->
+          <div class="pagination">
+            <!-- 이전 -->
+            <button
+              class="page-button"
+              :disabled="currentPage === 1"
+              @click="goPage(currentPage - 1)"
+            >
+              이전
+            </button>
+  
+            <!-- 숫자 버튼 -->
+            <button
+              v-for="page in totalPages"
+              :key="page"
+              class="page-button"
+              :class="{ 'page-active': page === currentPage }"
+              @click="goPage(page)"
+            >
+              {{ page }}
+            </button>
+  
+            <!-- 다음 -->
+            <button
+              class="page-button"
+              :disabled="currentPage === totalPages"
+              @click="goPage(currentPage + 1)"
+            >
+              다음
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -299,23 +302,24 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* TODO: BEM 네이밍 컨벤션에 맞춰 스타일 정리
-   .attendance-page { ... }
-   .attendance-page__summary { ... }
-   등으로 점진적으로 리팩터링 가능 */
-</style>
-
 
 <style scoped>
+.attendance-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
 .attendance-page {
   width: 100%;
-  height: 100%;
+  height: 85%;              
   padding: 36px;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 36px;
-  overflow: hidden;
+  overflow-y: auto; 
 }
 
 /* 상단 요약 카드 */

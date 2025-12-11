@@ -1,140 +1,142 @@
 <template>
-  <div class="attendance-page">
-    <!-- 상단 요약 카드 4개 -->
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="summary-title">이번 달 근무일</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">15</span>
-          <span class="summary-unit">시간</span>
+  <div class="attendance-wrapper">
+      <div class="attendance-page">
+        <!-- 상단 요약 카드 4개 -->
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="summary-title">이번 달 근무일</div>
+            <div class="summary-value-wrapper">
+              <span class="summary-value">15</span>
+              <span class="summary-unit">시간</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-title">오늘 근무</div>
+            <div class="summary-value-wrapper">
+              <span class="summary-value">기본근무제</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-title">이번 달 지각</div>
+            <div class="summary-value-wrapper">
+              <span class="summary-value">2</span>
+              <span class="summary-unit">회</span>
+            </div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-title">이번 달 결근</div>
+            <div class="summary-value-wrapper">
+              <span class="summary-value">0</span>
+              <span class="summary-unit">회</span>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="summary-card">
-        <div class="summary-title">오늘 근무</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">기본근무제</span>
-        </div>
-      </div>
+        <!-- 메인 패널 -->
+        <div class="panel">
+          <!-- 상단 탭 -->
+          <div class="panel-tabs">
+            <RouterLink
+              :to="{ name: 'AttendancePersonal' }"
+              class="tab tab-left"
+              :class="{ 'tab-active': isActiveTab('AttendancePersonal') }"
+            >
+              개인 근태 이력
+            </RouterLink>
 
-      <div class="summary-card">
-        <div class="summary-title">이번 달 지각</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">2</span>
-          <span class="summary-unit">회</span>
-        </div>
-      </div>
+            <RouterLink
+              :to="{ name: 'AttendanceOvertime' }"
+              class="tab"
+              :class="{ 'tab-active': isActiveTab('AttendanceOvertime') }"
+            >
+              초과 근무 이력
+            </RouterLink>
 
-      <div class="summary-card">
-        <div class="summary-title">이번 달 결근</div>
-        <div class="summary-value-wrapper">
-          <span class="summary-value">0</span>
-          <span class="summary-unit">회</span>
-        </div>
-      </div>
-    </div>
+            <RouterLink
+              :to="{ name: 'AttendanceCorrection' }"
+              class="tab"
+              :class="{ 'tab-active': isActiveTab('AttendanceCorrection') }"
+            >
+              근태 기록 수정 이력
+            </RouterLink>
 
-    <!-- 메인 패널 -->
-    <div class="panel">
-      <!-- 상단 탭 -->
-      <div class="panel-tabs">
-        <RouterLink
-          :to="{ name: 'AttendancePersonal' }"
-          class="tab tab-left"
-          :class="{ 'tab-active': isActiveTab('AttendancePersonal') }"
-        >
-          개인 근태 이력
-        </RouterLink>
+            <RouterLink
+              :to="{ name: 'AttendanceChangeLog' }"
+              class="tab tab-right"
+              :class="{ 'tab-active': isActiveTab('AttendanceChangeLog') }"
+            >
+              근무제 변경 이력
+            </RouterLink>
+          </div>
 
-        <RouterLink
-          :to="{ name: 'AttendanceOvertime' }"
-          class="tab"
-          :class="{ 'tab-active': isActiveTab('AttendanceOvertime') }"
-        >
-          초과 근무 이력
-        </RouterLink>
+          <!-- 검색 영역 (지금은 단순 텍스트 검색 인풋 + 버튼) -->
+          <div class="panel-search">
+            <div class="panel-search-inner">
+              <input
+                v-model="keyword"
+                class="search-input"
+                type="text"
+                placeholder="날짜, 사유 등으로 검색"
+              />
+              <button class="btn-search" @click="onSearch">검색</button>
+            </div>
+          </div>
 
-        <RouterLink
-          :to="{ name: 'AttendanceCorrection' }"
-          class="tab"
-          :class="{ 'tab-active': isActiveTab('AttendanceCorrection') }"
-        >
-          근태 기록 수정 이력
-        </RouterLink>
+          <!-- 테이블 영역 -->
+          <div class="panel-table-wrapper">
+            <div class="panel-table">
+              <table class="attendance-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>시작시간</th>
+                    <th>종료시간</th>
+                    <th>초과 근무 시간</th>
+                    <th>사유</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="(row, index) in filteredOvertimeList"
+                    :key="row.id"
+                    :class="{ 'row-striped': index % 2 === 1 }"
+                  >
+                    <td>{{ row.date }}</td>
+                    <td>{{ row.startTime }}</td>
+                    <td>{{ row.endTime }}</td>
+                    <td class="overtime-time">{{ row.overtimeDuration }}</td>
+                    <td>{{ row.reason }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
-        <RouterLink
-          :to="{ name: 'AttendanceChangeLog' }"
-          class="tab tab-right"
-          :class="{ 'tab-active': isActiveTab('AttendanceChangeLog') }"
-        >
-          근무제 변경 이력
-        </RouterLink>
-      </div>
+            <!-- 페이지네이션 (지금은 프론트에서만 동작하는 형태, 나중에 Personal처럼 교체 가능) -->
+            <div class="pagination">
+              <button class="page-button" @click="goPage(currentPage - 1)">
+                이전
+              </button>
 
-      <!-- 검색 영역 (지금은 단순 텍스트 검색 인풋 + 버튼) -->
-      <div class="panel-search">
-        <div class="panel-search-inner">
-          <input
-            v-model="keyword"
-            class="search-input"
-            type="text"
-            placeholder="날짜, 사유 등으로 검색"
-          />
-          <button class="btn-search" @click="onSearch">검색</button>
-        </div>
-      </div>
-
-      <!-- 테이블 영역 -->
-      <div class="panel-table-wrapper">
-        <div class="panel-table">
-          <table class="attendance-table">
-            <thead>
-              <tr>
-                <th>날짜</th>
-                <th>시작시간</th>
-                <th>종료시간</th>
-                <th>초과 근무 시간</th>
-                <th>사유</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="(row, index) in filteredOvertimeList"
-                :key="row.id"
-                :class="{ 'row-striped': index % 2 === 1 }"
+              <button
+                v-for="page in totalPages"
+                :key="page"
+                class="page-button"
+                :class="{ 'page-active': page === currentPage }"
+                @click="goPage(page)"
               >
-                <td>{{ row.date }}</td>
-                <td>{{ row.startTime }}</td>
-                <td>{{ row.endTime }}</td>
-                <td class="overtime-time">{{ row.overtimeDuration }}</td>
-                <td>{{ row.reason }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+                {{ page }}
+              </button>
 
-        <!-- 페이지네이션 (지금은 프론트에서만 동작하는 형태, 나중에 Personal처럼 교체 가능) -->
-        <div class="pagination">
-          <button class="page-button" @click="goPage(currentPage - 1)">
-            이전
-          </button>
-
-          <button
-            v-for="page in totalPages"
-            :key="page"
-            class="page-button"
-            :class="{ 'page-active': page === currentPage }"
-            @click="goPage(page)"
-          >
-            {{ page }}
-          </button>
-
-          <button class="page-button" @click="goPage(currentPage + 1)">
-            다음
-          </button>
+              <button class="page-button" @click="goPage(currentPage + 1)">
+                다음
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -259,14 +261,21 @@ function onSearch() {
 </script>
 
 <style scoped>
+.attendance-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+}
+
 .attendance-page {
   width: 100%;
-  height: 100%;
+  height: 85%;
   padding: 36px;
   display: flex;
   flex-direction: column;
   gap: 36px;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* 상단 요약 카드 */
