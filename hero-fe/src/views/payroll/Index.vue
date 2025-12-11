@@ -283,6 +283,9 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .payroll-header {

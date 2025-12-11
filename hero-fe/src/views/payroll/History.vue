@@ -126,11 +126,13 @@ const formatMoney = (value: number) => `₩${value.toLocaleString()}`;
 
 <style scoped>
 .pay-history-page {
-  padding-top: 24px;
-  padding-bottom: 40px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 32px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .history-cards {
