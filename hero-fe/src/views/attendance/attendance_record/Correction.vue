@@ -1,5 +1,3 @@
-<!-- src/views/attendance/attendance_record/Correction.vue -->
-
 <template>
   <div class="attendance-wrapper">
     <div class="attendance-page">
@@ -74,7 +72,7 @@
           </RouterLink>
         </div>
 
-        <!-- 검색 영역 (UI만, 아직 기능 없음) -->
+        <!-- 검색 영역 -->
         <div class="panel-search">
           <div class="panel-search-inner">
             <!-- 기간(시작) -->
@@ -103,7 +101,7 @@
               </div>
             </div>
 
-            <!-- 버튼 (지금은 동작 없음) -->
+            <!-- 버튼  -->
             <div class="search-button-group">
               <button class="btn-search" @click="onSearch">검색</button>
               <button class="btn-reset" @click="onReset">초기화</button>
@@ -127,8 +125,8 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(row, index) in correctionList"
-                  :key="row.id"
+                  v-for="(row, index) in store.correctionList"
+                  :key="row.correctionId"
                   :class="{ 'row-striped': index % 2 === 1 }"
                 >
                   <td>{{ row.date }}</td>
@@ -142,13 +140,36 @@
             </table>
           </div>
 
-          <!-- 페이지네이션 UI (지금은 더미, 클릭해도 변화 없음) -->
+          <!-- 페이지네이션 UI -->
           <div class="pagination">
-            <button class="page-button">이전</button>
-            <button class="page-button page-active">1</button>
-            <button class="page-button">2</button>
-            <button class="page-button">3</button>
-            <button class="page-button">다음</button>
+            <!-- 이전 -->
+            <button
+              class="page-button"
+              :disabled="currentPage === 1"
+              @click="goPage(currentPage - 1)"
+            >
+              이전
+            </button>
+
+            <!-- 숫자 버튼 -->
+            <button
+              v-for="page in totalPages"
+              :key="page"
+              class="page-button"
+              :class="{ 'page-active': page === currentPage }"
+              @click="goPage(page)"
+            >
+              {{ page }}
+            </button>
+
+            <!-- 다음 -->
+            <button
+              class="page-button"
+              :disabled="currentPage === totalPages"
+              @click="goPage(currentPage + 1)"
+            >
+              다음
+            </button>
           </div>
         </div>
       </div>
@@ -158,86 +179,48 @@
 
 <script lang="ts" setup>
 import { RouterLink, useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useCorrectionStore } from '@/stores/attendance/correction'
 
 const route = useRoute()
+const store = useCorrectionStore()
+
 const isActiveTab = (name: string) => route.name === name
 
 // 기간 인풋 (지금은 UI만)
 const startDate = ref('')
 const endDate = ref('')
 
-// 한 행 데이터 타입
-interface CorrectionRow {
-  id: number
-  date: string
-  prevStartTime: string
-  prevEndTime: string
-  newStartTime: string
-  newEndTime: string
-  reason: string
-}
+// 페이지네이션 바인딩용 (store 값 그대로 씀)
+const currentPage = computed(() => store.currentPage)
+const totalPages = computed(() => store.totalPages)
 
-// Figma 더미 데이터
-const correctionList = ref<CorrectionRow[]>([
-  {
-    id: 1,
-    date: '2025-12-01',
-    prevStartTime: '09:20',
-    prevEndTime: '18:00',
-    newStartTime: '09:00',
-    newEndTime: '18:00',
-    reason: '전장연 시위',
-  },
-  {
-    id: 2,
-    date: '2025-11-30',
-    prevStartTime: '09:00',
-    prevEndTime: '17:40',
-    newStartTime: '09:00',
-    newEndTime: '18:00',
-    reason: '부모님 병원 입원',
-  },
-  {
-    id: 3,
-    date: '2025-11-29',
-    prevStartTime: '09:12',
-    prevEndTime: '18:00',
-    newStartTime: '09:00',
-    newEndTime: '18:00',
-    reason: '갑작스러운 사고',
-  },
-  {
-    id: 4,
-    date: '2025-11-28',
-    prevStartTime: '09:05',
-    prevEndTime: '17:30',
-    newStartTime: '09:00',
-    newEndTime: '18:00',
-    reason: '근무 중 부상',
-  },
-  {
-    id: 5,
-    date: '2025-11-27',
-    prevStartTime: '09:40',
-    prevEndTime: '18:00',
-    newStartTime: '09:00',
-    newEndTime: '18:00',
-    reason: '안경 새로 맞추고 옴',
-  },
-])
+// 최초 진입 시 1페이지 로딩 + 기존 필터값이 있으면 인풋에도 반영
+onMounted(() => {
+  startDate.value = store.startDate || ''
+  endDate.value = store.endDate || ''
+  store.fetchCorrections(1)
+})
 
 // 지금은 그냥 콘솔 로그만 (나중에 백엔드 연동할 때 로직 추가)
 function onSearch() {
-  console.log('근태 수정 이력 검색 클릭 (아직 필터 로직 없음)', {
-    startDate: startDate.value,
-    endDate: endDate.value,
-  })
+  store.setFilterDates(startDate.value, endDate.value)
+
+  store.fetchCorrections(1)
 }
 
+// 초기화 버튼: 필터/페이지 초기화 후 다시 1페이지 조회
 function onReset() {
   startDate.value = ''
   endDate.value = ''
+  store.resetFilters()
+  store.fetchCorrections(1)
+}
+
+// 페이지 이동
+function goPage(page: number) {
+  if (page < 1 || page > totalPages.value) return
+  store.fetchCorrections(page)
 }
 
 // "09:00:00" 형식 대응용
