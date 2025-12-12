@@ -201,7 +201,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 
-import { useChangeLogStore } from '@/stores/attendance/chaneLog';
+import { useChangeLogStore } from '@/stores/attendance/changeLog';
 
 const route = useRoute();
 const changeLogStore = useChangeLogStore();
