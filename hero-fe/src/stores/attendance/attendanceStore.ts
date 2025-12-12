@@ -11,7 +11,7 @@
  */
 
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import apiClient from '@/api/apiClient';
 
 /**
  * 개인 근태 이력 한 건에 대한 DTO
@@ -95,8 +95,8 @@ export const useAttendanceStore = defineStore('attendanceStore', {
       this.currentPage = page;
 
       try {
-        const response = await axios.get<PageResponse<PersonalDTO>>(
-          '/api/attendance/personal',
+        const response = await apiClient.get<PageResponse<PersonalDTO>>(
+          '/attendance/personal',
           {
             params: {
               page,

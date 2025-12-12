@@ -10,7 +10,7 @@
  */
 
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import apiClient from '@/api/apiClient'
 
 /**
  * 근무제 변경 이력 한 건에 대한 DTO
@@ -94,8 +94,8 @@ export const useChangeLogStore = defineStore('changeLogStore', {
       this.currentPage = page
 
       try {
-        const response = await axios.get<PageResponse<ChangeLogDTO>>(
-          '/api/attendance/changeLog',
+        const response = await apiClient.get<PageResponse<ChangeLogDTO>>(
+          '/attendance/changeLog',
           {
             params: {
               page,

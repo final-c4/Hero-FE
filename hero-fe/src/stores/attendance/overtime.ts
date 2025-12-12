@@ -1,6 +1,6 @@
 // src/stores/overtime.ts
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import apiClient from '@/api/apiClient'
 
 /**
  * 초과 근무 한 건에 대한 DTO
@@ -74,8 +74,8 @@ export const useOvertimeStore = defineStore('overtimeStore', {
       this.currentPage = page
 
       try {
-        const res = await axios.get<PageResponse<OvertimeDTO>>(
-          '/api/attendance/overtime',
+        const res = await apiClient.get<PageResponse<OvertimeDTO>>(
+          '/attendance/overtime',
           {
             params: {
               page,

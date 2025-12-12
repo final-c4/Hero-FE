@@ -10,7 +10,7 @@
  */
 
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import apiClient from '@/api/apiClient'
 
 /**
  * 근태 수정 이력 한 건에 대한 DTO
@@ -94,8 +94,8 @@ export const useCorrectionStore = defineStore('correctionStore', {
       this.currentPage = page
 
       try {
-        const response = await axios.get<PageResponse<CorrectionDTO>>(
-          '/api/attendance/correction',
+        const response = await apiClient.get<PageResponse<CorrectionDTO>>(
+          '/attendance/correction',
           {
             params: {
               page,
