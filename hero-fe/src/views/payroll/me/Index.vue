@@ -179,8 +179,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { usePayrollStore } from '@/stores/payrollStore';
-import AccountModal from '@/views/payroll/BankAccountModal.vue';
-import PayslipModal from '@/views/payroll/PayslipModal.vue';
+import AccountModal from '@/views/payroll/me/BankAccountModal.vue';
+import PayslipModal from '@/views/payroll/me/PayslipModal.vue';
 
 // 급여 도메인 Pinia Store (summary, payslip, accounts 등 상태 및 API 호출 제공)
 const store = usePayrollStore();

@@ -33,14 +33,14 @@ import {
     setPrimaryBankAccount as apiSetPrimaryBankAccount,
     updateBankAccount,
     deleteBankAccount,
-} from '@/api/payroll';
+} from '@/api/payroll/payroll.me';
 
 import type {
     MyPaySummary,
     PayslipDetail,
     PayHistoryResponse,
     BankAccount
-} from '@/types/payroll';
+} from '@/types/payroll/payroll.me';
 
 
 //급여(Payroll) 도메인 상태 및 API 연동을 관리하는 Pinia 스토어

@@ -28,7 +28,7 @@ const payrollRoutes: RouteRecordRaw[] = [
   {
     path: '/payroll',
     name: 'PayrollMain',
-    component: () => import('@/views/payroll/Index.vue'),
+    component: () => import('@/views/payroll/me/Index.vue'),
     meta: {
       title: '급여 관리',
     },
@@ -38,7 +38,7 @@ const payrollRoutes: RouteRecordRaw[] = [
   {
     path: '/payroll/history',
     name: 'PayrollHistory',
-    component: () => import('@/views/payroll/History.vue'),
+    component: () => import('@/views/payroll/me/History.vue'),
     meta: {
       title: '급여 이력',
     },
