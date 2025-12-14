@@ -349,10 +349,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 
 // 활성화 된 상위 메뉴
 const activeParent = ref<string>('dashboard');
@@ -491,6 +492,25 @@ const handleCollapse = () => {
     activeSubMenu.value = '';
   }
 };
+
+const syncDashboardOnly = () => {
+  if (route.path === '/') {
+    // 대시보드만 활성(hover/active 효과)
+    activeParent.value = 'dashboard';
+    activeSubMenu.value = '';
+
+    // 서브메뉴 전부 닫기
+    isPersonnelOpen.value = false;
+    isEvaluationOpen.value = false;
+    isApprovalOpen.value = false;
+    isAttendanceOpen.value = false;
+    isVacationOpen.value = false;
+    isPayrollOpen.value = false;
+    isPayrollAdminOpen.value = false;
+  }
+};
+
+watch(() => route.path, syncDashboardOnly, { immediate: true });
 </script>
 
 <style scoped>
