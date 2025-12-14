@@ -10,10 +10,11 @@
   2025/12/10 - 민철 결재 도메인 라우터 추가
   2025/12/11 - 동근 급여 부분 추가 & JSDoc 추가
   2025/12/12 - 동근 급여 관리 부분 추가
+  2025/12/14 - 동근 헤더 메인로고 클릭 시 대시보드 경로 일 때 사이드바 상태 동기화
   </pre>
  
   @author 승건
-  @version 1.5
+  @version 1.6
  -->
 <template>
   <div :class="['sidebar-container', { collapsed: isCollapsed }]">
