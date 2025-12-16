@@ -25,16 +25,22 @@ const notificationRoutes: RouteRecordRaw[] = [
     meta: {
       title: '알림'
     }
+  },
+  {
+    path: '/notifications/:id',
+    name: 'NotificationDetail',
+    // Lazy Loading: 알림 상세 페이지
+    component: () => import('@/views/notification/NotificationDetail.vue'),
+    meta: {
+      title: '알림 상세'
+    }
+  },
+  {
+    path: '/notifications/settings',
+    name: 'NotificationSettings',
+    component: () => import('@/views/notification/NotificationSettings.vue'),
+    meta: { requiresAuth: true }
   }
-  // {
-  //   path: '/notifications/:id',
-  //   name: 'NotificationDetail',
-  //   // Lazy Loading: 알림 상세 페이지
-  //   component: () => import('@/views/notification/NotificationDetail.vue'),
-  //   meta: {
-  //     title: '알림 상세'
-  //   }
-  // }
 ];
 
 export default notificationRoutes;
