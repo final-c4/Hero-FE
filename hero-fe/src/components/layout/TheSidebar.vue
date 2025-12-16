@@ -564,6 +564,7 @@ const syncActiveByRoute = (path: string) => {
     if (!isCollapsed.value) isAttendanceOpen.value = true;
     if (path.includes('attendance_record')) activeSubMenu.value = 'attendanceRecord';
     else if (path.includes('/department')) activeSubMenu.value = 'attendanceDept';
+    else if (path.includes('/dashboard')) activeSubMenu.value = 'attendanceDashboard';
     return;
   }
 
