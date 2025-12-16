@@ -9,14 +9,15 @@
  * - Notification: 프론트엔드 UI용 데이터 구조
  * - NotificationType: 백엔드 알림 타입 (11종)
  * - NotificationCategory: 프론트엔드 카테고리 (6종)
+ * - NotificationSettings: 알림 설정 타입
  *
  * History
  * 2025/12/14 (혜원) 최초 작성
- * 2025/12/16 (혜원) 필드 추가
+ * 2025/12/16 (혜원) 필드 추가, 설정 타입 추가
  * </pre>
  *
  * @author 혜원
- * @version 1.0
+ * @version 2.0
  */
 
 /**
@@ -30,7 +31,7 @@
  * @property {string | null} link - 연결된 페이지 경로
  * @property {boolean} isRead - 읽음 여부
  * @property {boolean} isDeleted - 소프트 삭제 여부
- * @property {string} createdAt - 생성 일시 
+ * @property {string} createdAt - 생성 일시
  * @property {string | null} readAt - 읽은 일시
  * @property {string | null} deletedAt - 소프트 삭제 일시
  * @property {number} employeeId - 수신자 직원 ID
@@ -69,7 +70,7 @@ export interface NotificationDTO {
  * @property {string | null} link - 이동할 페이지 경로 (없으면 null)
  * @property {boolean} isRead - 읽음 여부
  * @property {boolean} isDeleted - 삭제 여부
- * @property {string} createdAt - 생성 일시 (ISO 8601 형식)
+ * @property {string} createdAt - 생성 일시
  * @property {string | null} readAt - 읽은 일시 (읽지 않았으면 null)
  * @property {string | null} deletedAt - 삭제 일시 (삭제 안 했으면 null)
  * @property {number | null} attendanceId - 관련 근태 ID
@@ -79,31 +80,22 @@ export interface NotificationDTO {
  * @property {string} timeAgo - UI 표시용 상대 시간 (방금 전, 1시간 전 등)
  */
 export interface Notification {
-  // 기본 정보
   notificationId: number;
   employeeId: number;
   type: NotificationCategory;
   title: string;
   message: string;
-  
-  // 링크 및 상태
   link: string | null;
   isRead: boolean;
   isDeleted: boolean;
-  
-  // 시간 정보
   createdAt: string;
   readAt: string | null;
   deletedAt: string | null;
-  
-  // 연관 ID들
   attendanceId: number | null;
   payrollId: number | null;
   documentId: number | null;
   evaluationId: number | null;
-  
-  // UI 전용 필드
-  timeAgo: string;  // computed 값
+  timeAgo: string;
 }
 
 /**
@@ -205,22 +197,38 @@ export interface StompFrame {
 
 /**
  * 알림 설정
+ * 
+ * @description 사용자의 알림 수신 설정 정보
+ * @property {boolean} attendanceEnabled - 근태 알림 활성화 여부
+ * @property {boolean} payrollEnabled - 급여 알림 활성화 여부
+ * @property {boolean} approvalEnabled - 결재 알림 활성화 여부
+ * @property {boolean} leaveEnabled - 휴가 알림 활성화 여부
+ * @property {boolean} evaluationEnabled - 평가 알림 활성화 여부
+ * @property {boolean} systemEnabled - 시스템 알림 활성화 여부
+ * @property {boolean} browserNotification - 브라우저 알림 활성화 여부
+ * @property {boolean} emailNotification - 이메일 알림 활성화 여부
+ * @property {boolean} smsNotification - SMS 문자 알림 활성화 여부
  */
 export interface NotificationSettings {
-  attendanceEnabled: boolean;      // 근태 알림
-  payrollEnabled: boolean;         // 급여 알림
-  approvalEnabled: boolean;        // 결재 알림
-  leaveEnabled: boolean;           // 휴가 알림
-  evaluationEnabled: boolean;      // 평가 알림
-  systemEnabled: boolean;          // 시스템 알림
-    // 수신 방법
+  attendanceEnabled: boolean;
+  payrollEnabled: boolean;
+  approvalEnabled: boolean;
+  leaveEnabled: boolean;
+  evaluationEnabled: boolean;
+  systemEnabled: boolean;
   browserNotification: boolean;
   emailNotification: boolean;
-  smsNotification: boolean; 
+  smsNotification: boolean;
 }
 
 /**
  * 알림 설정 항목
+ * 
+ * @description 설정 페이지에서 표시할 개별 설정 항목 정보
+ * @property {keyof NotificationSettings} id - 설정 키 (NotificationSettings의 속성명)
+ * @property {string} label - 설정 항목 라벨
+ * @property {string} description - 설정 항목 설명
+ * @property {string} icon - 아이콘 경로
  */
 export interface NotificationSettingItem {
   id: keyof NotificationSettings;
