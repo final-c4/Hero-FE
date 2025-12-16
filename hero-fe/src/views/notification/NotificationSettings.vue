@@ -301,7 +301,7 @@ const handleResetSettings = () => {
 // 5. 생명주기 훅
 
 /**
- * 컴포넌트 마운트 시 Pinia Store에서 기존 설정 값을 불러옵니다.
+ * 컴포넌트 마운트 시 Pinia Store에서 기존 설정 값을 불러옴
  */
 onMounted(() => {
   settingsStore.loadSettings();
