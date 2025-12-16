@@ -139,16 +139,32 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
+import { useAuthStore } from '@/stores/auth';
 
 // useRouter()를 router 변수로 정의, useRoute()를 route 변수로 정의 (외부 로직)
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 
 //URL의 /:id를 templateId 변수로 정의
 const templateId = route.params.id;
 
 // Reactive 데이터
 const template = ref<any>(null);
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명 : 평가 템플릿 상세 데이터 조회 메소드
@@ -179,6 +195,10 @@ const goBack = () => router.back();
  * 설명 : 수정 페이지로 이동
  */
 const goToEdit = () => {
+  if(authDepartmentId.value != 2){
+    alert("인사팀이 아니라서 수정할 수 없습니다.")
+    goBack();
+  }
   router.push(`/evaluation/template/edit/${templateId}`);
 };
 

@@ -15,7 +15,12 @@
       <div class="content-box">
         <!-- 헤더 -->
         <div class="header">
-          <button class="btn-new" @click="createGuide">
+          <button 
+            class="btn-new"
+            :class="{ disabled: authDepartmentId !== 2 }"
+            :disabled="authDepartmentId !== 2" 
+            @click="createGuide"
+          >
             + 새 평가 가이드 작성
           </button>
         </div>
@@ -84,9 +89,11 @@
 import apiClient from "@/api/apiClient"
 import { ref, onMounted, computed } from "vue"
 import { useRouter } from "vue-router"
+import { useAuthStore } from '@/stores/auth';
 
 //외부 로직
-const router = useRouter()
+const router = useRouter();
+const authStore = useAuthStore();
 
 //페이지네이션 타입
 interface PageResponse<T> {
@@ -119,6 +126,20 @@ const errorMessage = ref<string>("")
 const currentPage = ref(0) 
 const pageSize = ref(10)
 const totalPages = ref(0)
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명: 전체 평가 가이드 조회
@@ -302,5 +323,11 @@ onMounted(async () => {
   background: #155DFC;
   border: none;
   color: #fff;
+}
+
+.btn-new.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
 }
 </style>

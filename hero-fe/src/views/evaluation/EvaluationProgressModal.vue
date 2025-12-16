@@ -18,7 +18,7 @@
       <!-- ===== Header ===== -->
       <header class="modal-header">
         <div class="header-left">
-          <div class="header-icon"></div>
+          <img class="header-icon" src="/images/people.svg"></img>
           <div class="header-text">
             <h2>평가 진행 현황</h2>
             <p class="subtitle">
@@ -84,7 +84,7 @@
           <div class="action">
             <!-- 미실시 -->
             <button
-              v-if="emp.evaluateeStatus === 0"
+              v-if="emp.evaluateeStatus === 0 && authEmployeeId === emp.evaluateeEmployeeId"
               class="btn-action primary"
               @click="goWrite(emp)"
             >
@@ -93,12 +93,24 @@
 
             <!-- 제출 완료 -->
             <button
-              v-else-if="emp.evaluateeStatus === 1"
+              v-else-if="emp.evaluateeStatus === 1 && authEmployeeId === emp.evaluateeEmployeeId"
               class="btn-action warning"
               @click="goEdit(emp)"
             >
               수정하기
             </button>
+
+            <button
+              v-else-if="
+                emp.evaluateeStatus === 1 &&
+                authEmployeeId === evaluationDetail?.evaluationEmployeeId
+              "
+              class="btn-action primary"
+              @click="goEvaluate(emp)"
+            >
+              평가하기
+            </button>
+            
 
             <!-- 평가 완료 -->
             <button
@@ -128,8 +140,11 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
+import { useAuthStore } from '@/stores/auth';
 
+//외부 로직
 const router = useRouter();
+const authStore = useAuthStore();
 
 // props 데이터
 const props = defineProps<{
@@ -143,7 +158,23 @@ const emit = defineEmits<{
 
 //Reactive 데이터
 const evaluationDetail = ref<any>(null);
+const employeeId = ref();
+const departmentId = ref();
 const evaluatees = ref<any[]>([]);
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명: 평가 세부 데이터 조회
@@ -157,6 +188,8 @@ const fetchEvaluationDetail = async () => {
     );
 
     evaluationDetail.value = res.data;
+    employeeId.value = res.data.evaluationEmployeeId;
+    departmentId.value = res.data.evaluationDepartmentId;
     evaluatees.value = res.data.evaluatees ?? [];
   } catch (e) {
     console.error("평가 상세 조회 실패", e);
@@ -174,7 +207,7 @@ const goWrite = (emp: any) => {
     path: `/evaluation/form/create/${evaluationId}`,
     query: {
       employeeId: emp.evaluateeEmployeeId,
-      departmentId: emp.evaluateeDepartmentId,
+      departmentId: departmentId.value,
     },
   });
 };
@@ -183,8 +216,16 @@ const goWrite = (emp: any) => {
  * 설명: 평가서 수정
  */
 const goEdit = (emp: any) => {
-  console.log("평가서 수정", emp);
-  // router.push(`/evaluation/form/edit/${emp.evaluateeEmployeeId}`)
+  const evaluationId = evaluationDetail.value?.evaluationEvaluationId;
+  if (!evaluationId) return;
+
+  router.push({
+    path: `/evaluation/form/edit/${evaluationId}`,
+    query: {
+      employeeId: emp.evaluateeEmployeeId,
+      departmentId: departmentId.value,
+    },
+  });
 };
 
 /**
@@ -193,6 +234,23 @@ const goEdit = (emp: any) => {
 const goView = (emp: any) => {
   console.log("평가서 확인", emp);
   // router.push(`/evaluation/form/view/${emp.evaluateeEmployeeId}`)
+};
+
+/**
+ * 설명: 평가하기 페이지로 이동하는 메소드
+ * @param {any} emp - 평가 데이터 
+ */
+const goEvaluate = (emp: any) => {
+  const evaluationId = evaluationDetail.value?.evaluationEvaluationId;
+  if (!evaluationId) return;
+
+  router.push({
+    path: `/evaluation/evaluate/${evaluationId}`,
+    query: {
+      employeeId: emp.evaluateeEmployeeId,
+      departmentId: departmentId.value,
+    },
+  });
 };
 
 /**
@@ -295,10 +353,8 @@ const formatPeriod = (item: any) => {
 }
 
 .header-icon {
-  width: 28px;
-  height: 28px;
-  border: 2px solid white;
-  border-radius: 6px;
+  width: 30px;
+  height: 30px;
 }
 
 .header-text h2 {

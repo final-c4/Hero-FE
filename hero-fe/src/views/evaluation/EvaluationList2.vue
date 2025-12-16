@@ -89,6 +89,7 @@
 
                 <button
                   class="btn danger"
+                  :disabled="authEmployeeId !== item.evaluationEmployeeId"
                   @click.stop="deleteEvaluation(item.evaluationEvaluationId)"
                 >
                   삭제
@@ -131,12 +132,16 @@
 </template>
 
 <script setup lang="ts">
+//Import 구문
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
 import EvaluationProgressModal from "@/views/evaluation/EvaluationProgressModal.vue";
+import { useAuthStore } from '@/stores/auth';
 
+//외부 로직
 const router = useRouter();
+const authStore = useAuthStore();
 
 // 페이지네이션 타입
 interface PageResponse<T> {
@@ -157,6 +162,20 @@ const totalPages = ref(0);
 
 const showProgressModal = ref(false);
 const selectedEvaluation = ref<any>(null);
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명: 생성된 평가 목록 조회 메소드
@@ -518,5 +537,10 @@ onMounted(() => {
 
 .clickable-row:hover {
   background-color: #f8fafc;
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>

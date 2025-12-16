@@ -66,10 +66,12 @@ import { ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import apiClient from "@/api/apiClient"
 import "@toast-ui/editor/dist/toastui-editor.css"
+import { useAuthStore } from '@/stores/auth';
 
 // 외부 로직
-const route = useRoute()
-const router = useRouter()
+const route = useRoute();
+const router = useRouter();
+const authStore = useAuthStore();
 
 //Reactive 데이터
 const guideId = ref<number | null>(null)
@@ -77,6 +79,20 @@ const guideName = ref<string>("")
 const creator = ref<string>("")
 const departmentName = ref<string>("")
 const guideContent = ref<string>("")
+
+  const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명: 이전 페이지로 이동하는 메소드
@@ -89,6 +105,12 @@ const goBack = () => {
  * 설명: 평가 가이드 수정 페이지로 이동하는 메소드
  */
 const goToEdit = () => {
+  if(authDepartmentId.value != 2){
+    alert("인사팀이 아니라서 수정할 수 없습니다.")
+    goBack();
+  }
+
+
   router.push(`/evaluation/guide/edit/${guideId.value}`);
 };
 

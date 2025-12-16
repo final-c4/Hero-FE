@@ -1,11 +1,10 @@
-종 전체 코드)
-<!-- 
-  File Name   : CreateEvaluationForm.vue
-  Description : 피평가자가 평가서를 작성하는 페이지
- 
+<!--
+  File Name   : EditEvaluationForm.vue
+  Description : 평가자가 평가서를 수정/채점하는 페이지
+
   History
   2025/12/15 - 승민 최초 작성
- 
+
   @author 승민
 -->
 
@@ -15,27 +14,19 @@
 
     <!-- ===== Header ===== -->
     <div class="header">
-        <div class="title-wrapper">
-            <img
-            class="back-icon"
-            src="/images/backArrow.svg"
-            @click="goBack"
-            />
-            <h1 class="title">평가서 작성</h1>
-        </div>
+      <div class="title-wrapper">
+        <img class="back-icon" src="/images/backArrow.svg" @click="goBack" />
+        <h1 class="title">평가서 수정</h1>
+      </div>
 
-        <div class="btn-container">
-            <button
-            class="btn-edit"
-            @click="submitForm"
-            :disabled="weightSum !== 100"
-            >
-            저장
-            </button>
-            <button class="btn-remove" @click="goBack">
-            취소
-            </button>
-        </div>
+      <div class="btn-container">
+        <button class="btn-edit" @click="submitUpdate">
+          저장
+        </button>
+        <button class="btn-remove" @click="goBack">
+          취소
+        </button>
+      </div>
     </div>
 
     <div class="content">
@@ -44,22 +35,17 @@
         <!-- ===== 왼쪽 : 평가서 ===== -->
         <div class="form-box">
 
-          <!-- 평가 정보 -->
           <h2 class="section-title">{{ evaluation.name }}</h2>
 
           <div class="flex-row">
             <div class="form-item">
               <label>평가자</label>
-              <div class="text-view manager-view">
-                {{ evaluation.managerName }}
-              </div>
+              <div class="text-view manager-view">{{ evaluation.managerName }}</div>
             </div>
 
             <div class="form-item">
               <label>피평가자</label>
-              <div class="text-view evaluatee-view">
-                {{ evaluatee.name }}
-              </div>
+              <div class="text-view evaluatee-view">{{ evaluatee.name }}</div>
             </div>
           </div>
 
@@ -75,52 +61,50 @@
 
           <div
             v-for="(item, index) in formItems"
-            :key="item.selectedItemId"
+            :key="item.formItemId"
             class="eval-card"
           >
             <div class="eval-card-header">
-              <div class="eval-left">
+                <div class="eval-left">
                 <div class="eval-index">{{ index + 1 }}</div>
                 <div class="eval-title">{{ item.itemName }}</div>
-              </div>
+                </div>
 
-              <div class="weight-input">
-                  <span>가중치</span>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      v-model.number="item.weight"
-                    />
-                    %
-              </div>
+                <!-- 가중치 -->
+                <div class="weight-input">
+                <span>가중치</span>
+                <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    v-model.number="item.weight"
+                />
+                %
+                </div>
             </div>
 
             <div class="eval-body">
+                <p>{{ item.description }}</p>
 
-              <p>{{ item.description }}</p>
-
-              <!-- 평가 기준 -->
-              <div class="criteria-list">
+                <!-- 평가 기준 (읽기 전용) -->
+                <div class="criteria-list">
                 <div
-                  v-for="c in item.criterias"
-                  :key="c.criteriaRank"
-                  class="criteria-card"
+                    v-for="c in item.criterias"
+                    :key="c.criteriaRank"
+                    class="criteria-card"
                 >
-                  <div class="criteria-badge">
-                    {{ c.criteriaRank }}
-                  </div>
-                  <div>
+                    <div class="criteria-badge">{{ c.criteriaRank }}</div>
+                    <div>
                     {{ c.criteriaDescription }}
                     <small>
-                      ({{ c.criteriaMinScore }} ~ {{ c.criteriaMaxScore }}점)
+                        ({{ c.criteriaMinScore }} ~ {{ c.criteriaMaxScore }}점)
                     </small>
-                  </div>
+                    </div>
                 </div>
-              </div>
+                </div>
 
-              <!-- 본인 실적 -->
-              <div class="form-item">
+                <!-- 본인 실적 -->
+                <div class="form-item">
                 <label>본인 실적</label>
                 <div class="self-desc-card">
                   <textarea
@@ -128,8 +112,7 @@
                     placeholder="본인의 실적을 구체적으로 작성해주세요."
                   />
                 </div>
-              </div>
-
+                </div>
             </div>
           </div>
 
@@ -157,28 +140,34 @@
 
 <!--script-->
 <script setup lang="ts">
-//Import 구문
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
 import { useAuthStore } from '@/stores/auth';
 
-// 외부 로직
-const authStore = useAuthStore();
+
+//외부 로직
 const route = useRoute();
 const router = useRouter();
+const goBack = () => router.back();
+const authStore = useAuthStore();
 
-// Reactive 데이터
+const evaluationId = Number(route.params.id);
+const employeeId = Number(route.query.employeeId);
+
+//Reactive 데이터
+const evaluation = ref<any>({});
+const evaluatee = ref<any>({});
+const formItems = ref<any[]>([]);
+
+const formId = ref<number | null>(null);
+
 const authEmployeeId = ref();
 const authEmployeeName = ref();
 const authDepartmentId = ref();
 const authDepartmentName = ref();
 const authGradeId = ref();
 const authGradeName = ref();
-
-const evaluation = ref<any>({});
-const evaluatee = ref<any>({});
-const formItems = ref<any[]>([]);
 
 authEmployeeId.value = authStore.user?.employeeId
 authEmployeeName.value = authStore.user?.employeeName
@@ -187,94 +176,90 @@ authDepartmentName.value = authStore.user?.departmentName
 authGradeId.value = authStore.user?.gradeId
 authGradeName.value = authStore.user?.gradeName
 
-const evaluationId = Number(route.params.id);
-const employeeId = Number(route.query.employeeId);
-const departmentId = Number(route.query.departmentId);
-
 /**
- * 설명: 이전 페이지로 이동하는 메소드
+ * 설명: 평가서 데이터 조회 메소드
  */
-const goBack = () => router.back();
-
-
-
-/**
- * 설명: 평가 데이터 조회 메소드
- */
-const loadData = async () => {
+const loadForm = async () => {
   const res = await apiClient.get(
-    `/evaluation/evaluation/select/${evaluationId}`
+    `/evaluation/evaluation-form/select/${evaluationId}/${employeeId}`
   );
   const data = res.data;
 
-  evaluation.value = {
-    name: data.evaluationName,
-    managerName: data.evaluationEmployeeName,
-    periodStart: data.evaluationEvaluationPeriodStart?.slice(0, 10),
-    periodEnd: data.evaluationEvaluationPeriodEnd?.slice(0, 10),
-  };
+  formId.value = data.evaluationFormFormId;
 
-  const target = data.evaluatees.find(
-    (e: any) => e.evaluateeEmployeeId === employeeId
-  );
+  evaluation.value = {
+    name: data.evaluationFormEvaluationName,
+    managerName: data.evaluationFormEvaluationEmployeeName,
+    periodStart: data.evaluationFormEvaluationPeriodStart?.slice(0, 10),
+    periodEnd: data.evaluationFormEvaluationPeriodEnd?.slice(0, 10),
+  };
 
   evaluatee.value = {
-    name: target.evaluateeEmployeeName,
-    grade: target.evaluateeGrade,
+    name: data.evaluationFormEmployeeName,
   };
 
-  formItems.value = data.selectedItems.map((item: any) => ({
-    selectedItemId: item.selectedItemSelectedItemId,
-    itemName: item.selectedItemItemName,
-    description: item.selectedItemItemDescription,
-    weight: 0,
-    selfDescription: "",
+  formItems.value = data.formItems.map((item: any) => ({
+    formItemId: item.formItemFormItemId,
+    selectedItemId: item.formItemSelectedItemId,
+    itemName: item.formItemSelectedItemItemName,
+    description: item.formItemSelectedItemItemDescription,
+    weight: item.formItemWeight,
+    selfDescription: item.formItemDescription,
     criterias: item.criterias,
+
+    score: item.itemScore?.itemScoreScore ?? null,
+    rank: item.itemScore?.itemScoreRank ?? null,
+    comment: item.itemScore?.itemScoreDescription ?? null,
+    itemScoreId: item.itemScore?.itemScoreItemScoreId ?? null,
   }));
 };
 
 /**
- * 설명: 마운트 시, 평가 데이터 조회
+ * 설명: 마운트 시, 평가서 데이터 조회
  */
 onMounted(() => {
-    if(authEmployeeId.value != employeeId){
-        alert("피평가자 본인이 아니시군요.")
-        goBack()
+    if (authEmployeeId.value !== employeeId) {
+      alert("본인만 수정할 수 있습니다.");
+      router.back();
+      return;
     }
-    loadData();
+    loadForm()
+
 });
 
-/* ===== 가중치 합 ===== */
+/**
+ * 설명: 가중치 합 계산 메소드
+ */
 const weightSum = computed(() =>
   formItems.value.reduce((sum, i) => sum + (i.weight || 0), 0)
 );
 
-/* ===== 저장 ===== */
-const submitForm = async () => {
+/**
+ * 설명: 평가서 수정 메소드
+ */
+const submitUpdate = async () => {
   if (weightSum.value !== 100) {
     alert("가중치 합계는 100%여야 합니다.");
     return;
   }
 
-  await apiClient.post("/evaluation/evaluation-form/create", {
-    evaluationFormEvaluationId: evaluationId,
-    evaluationFormEmployeeId: employeeId,
-    evaluationFormDepartmentId: departmentId,
+  await apiClient.put("/evaluation/evaluation-form/update", {
+    evaluationFormFormId: formId.value,
     evaluationFormCreatedAt: new Date(),
     formItems: formItems.value.map(item => ({
-      formItemSelectedItemId: item.selectedItemId,
-      formItemWeight: item.weight,
-      formItemDescription: item.selfDescription,
-      itemScore: {
-
-      },
+        formItemFormItemId: item.formItemId,
+        formItemWeight: item.weight,
+        formItemDescription: item.selfDescription,
     })),
   });
 
-  alert("평가서가 저장되었습니다.");
+  alert("채점이 완료되었습니다.");
   router.back();
 };
 
+/**
+ * 설명: 가중치 게이지 계산 메소드
+ */
 const gaugeWidth = computed(() => {
   const value = Math.min(weightSum.value, 100);
   return `${value}%`;

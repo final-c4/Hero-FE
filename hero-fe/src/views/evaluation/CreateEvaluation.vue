@@ -175,10 +175,12 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
+import { useAuthStore } from '@/stores/auth';
 
 //외부 로직
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
 
 const templateId = Number(route.params.id);
 
@@ -188,6 +190,23 @@ const evaluationName = ref("");
 const template = ref<any>(null);
 const templateItems = ref<any[]>([]);
 const selectedItemIds = ref<number[]>([]);
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
+
+
 
 // 기준 접기/펼치기 상태 
 const openedCriteria = ref<{ [key: number]: boolean }>({});
@@ -270,8 +289,8 @@ const saveEvaluation = async () => {
   }
 
   const payload = {
-    evaluationEmployeeId: template.value.evaluationTemplateEmployeeId,
-    evaluationDepartmentId: template.value.evaluationTemplateDepartmentId,
+    evaluationEmployeeId: authEmployeeId.value,
+    evaluationDepartmentId: authDepartmentId.value,
     evaluationTemplateId: templateId,
     evaluationName: evaluationName.value,
     evaluationStatus: 0,
@@ -298,6 +317,10 @@ const saveEvaluation = async () => {
  * 설명: 마운트 시, 평가 테플릿과 가이드 조회
  */
 onMounted(async () => {
+  if(authGradeId.value != 6){
+    alert("직급이 부장이 아니시라서 평가를 생성할 수 없습니다.")
+    goBack();
+  }
   await loadTemplate();
   await loadGuides();
 });

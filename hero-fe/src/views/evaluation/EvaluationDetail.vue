@@ -7,6 +7,7 @@
   @author 승민
 -->
 
+<!--template-->
 <template>
   <div class="container">
     <!-- Header (CreateEvaluation.vue와 동일 패턴) -->
@@ -175,25 +176,39 @@
   </div>
 </template>
 
+<!--script-->
 <script setup lang="ts">
+//Import 구문
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
 
+//외부 로직
 const route = useRoute();
 const router = useRouter();
+
+/**
+ * 설명: 이전 페이지로 이동하는 메소드
+ */
 const goBack = () => router.back();
 
 const evaluationId = Number(route.params.id);
 
+//Reactive 데이터
 const evaluation = ref<any>(null);
-
-/** 기준 접기/펼치기 상태 (selectedItemSelectedItemId 기준) */
 const openedCriteria = ref<Record<number, boolean>>({});
+
+/**
+ * 설명: 평가 기준 토글 메소드
+ * @param {number} selectedItemId - 선택된 평가 항목 ID 
+ */
 const toggleCriteria = (selectedItemId: number) => {
   openedCriteria.value[selectedItemId] = !openedCriteria.value[selectedItemId];
 };
 
+/**
+ * 설명: 평가 기간 형식 변환 메소드
+ */
 const formattedPeriod = computed(() => {
   if (!evaluation.value) return "-";
   const start = evaluation.value.evaluationEvaluationPeriodStart?.slice(0, 10);
@@ -202,7 +217,10 @@ const formattedPeriod = computed(() => {
   return `${start} ~ ${end}`;
 });
 
-/** 평가 상태 텍스트(너 서비스에서 0/1/2 쓰는 걸 기준으로 매핑) */
+/**
+ * 설명: 평가 상태 전환 메소드
+ * @param {number} status - 평가 상태 값 
+ */
 const statusText = (status: number) => {
   switch (status) {
     case 0: return "진행중(미작성 존재)";
@@ -211,6 +229,11 @@ const statusText = (status: number) => {
     default: return `상태 ${status}`;
   }
 };
+
+/**
+ * 설명: 평가 상태 뱃지색깔 전환 메소드
+ * @param {number} status - 평가 상태 값 
+ */
 const statusClass = (status: number) => {
   switch (status) {
     case 0: return "badge-warn";
@@ -220,7 +243,10 @@ const statusClass = (status: number) => {
   }
 };
 
-/** 피평가자 상태: createForm에서 0->1, gradingForm에서 2로 변경하는 로직 기반 */
+/**
+ * 설명: 피평가자 상태 전환 메소드
+ * @param {number} status - 피평가자 상태 값 
+ */
 const evaluateeStatusText = (status: number) => {
   switch (status) {
     case 0: return "미작성";
@@ -229,6 +255,11 @@ const evaluateeStatusText = (status: number) => {
     default: return `상태 ${status}`;
   }
 };
+
+/**
+ * 설명: 피평가자 상태 뱃지색깔 전환 메소드 
+ * @param {number} status - 피평가자 상태 값 
+ */
 const evaluateeStatusClass = (status: number) => {
   switch (status) {
     case 0: return "badge-warn";
@@ -238,6 +269,9 @@ const evaluateeStatusClass = (status: number) => {
   }
 };
 
+/**
+ * 설명: 평가 조회 메소드
+ */
 const loadEvaluation = async () => {
   const res = await apiClient.get(`/evaluation/evaluation/select/${evaluationId}`);
   evaluation.value = res.data;
@@ -250,11 +284,17 @@ const loadEvaluation = async () => {
   });
 };
 
+/**
+ * 설명: 평가 재조회 메소드
+ */
 const reload = async () => {
   evaluation.value = null;
   await loadEvaluation();
 };
 
+/**
+ * 설명: 평가 삭제 메소드
+ */
 const deleteEvaluation = async () => {
   if (!confirm("정말 이 평가를 삭제할까요? (되돌릴 수 없습니다)")) return;
 
@@ -263,9 +303,13 @@ const deleteEvaluation = async () => {
   router.back();
 };
 
+/**
+ * 설명: 마운트 시, 평가 조회
+ */
 onMounted(loadEvaluation);
 </script>
 
+<!--style-->
 <style scoped>
 /* ================= Layout ================= */
 .container {

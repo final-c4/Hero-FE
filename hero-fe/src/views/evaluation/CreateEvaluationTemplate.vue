@@ -172,24 +172,51 @@
 <!--script-->
 <script setup lang="ts">
 // Import 구문
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import apiClient from "@/api/apiClient";
 import { useRouter } from "vue-router";
+import { useAuthStore } from '@/stores/auth';
 
 // useRouter()를 router 변수로 정의 (외부 로직)
 const router = useRouter();
+const authStore = useAuthStore();
 
 // Reactive 데이터
 const templateName = ref("");
-const creator = ref("박지윤"); 
-const employeeId = ref(9);     
-const departmentId = ref<number>(2); 
-const departmentName = ref("인사팀"); 
+const creator = ref(""); 
+const employeeId = ref();     
+const departmentId = ref<number>(); 
+const departmentName = ref(""); 
 const periodName = ref("");
 const startDate = ref("");
 const endDate = ref("");
 const evaluationType = ref<number | null>(null);
 
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
+
+onMounted(() => {
+  if(authDepartmentId.value != 2){
+    alert("인사팀이 아닙니다.");
+    goBack();
+  }
+
+  employeeId.value = authEmployeeId.value
+  creator.value = authEmployeeName.value
+  departmentId.value = authDepartmentId.value
+  departmentName.value = authDepartmentName.value
+})
 
 // 평가 기준 타입
 interface Criteria {

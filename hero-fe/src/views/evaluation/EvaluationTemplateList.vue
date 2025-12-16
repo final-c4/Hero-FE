@@ -17,7 +17,12 @@
     <div class="inner-wrapper">
       <div class="content-box">
         <div class="header">
-          <button class="btn-new" @click="createTemplate">
+          <button
+            class="btn-new"
+            :class="{ disabled: authDepartmentId !== 2 }"
+            :disabled="authDepartmentId !== 2"
+            @click="createTemplate"
+          >
             + 새 템플릿 작성
           </button>
         </div>
@@ -88,9 +93,12 @@
 import apiClient from '@/api/apiClient';
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
+
 
 // useRouter()를 router변수로 정의 (외부 로직)
 const router = useRouter();
+const authStore = useAuthStore();
 
 //페이지네이션 타입
 interface PageResponse<T> {
@@ -150,6 +158,21 @@ const totalPages = ref(0)
 
 const loading = ref(false)
 const errorMessage = ref('')
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 
 
@@ -354,5 +377,11 @@ onMounted(async () => {
 .page-btn.disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.btn-new.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
 }
 </style>

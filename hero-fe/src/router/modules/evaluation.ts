@@ -126,6 +126,24 @@ const evaluationRoutes: RouteRecordRaw[] = [
       title: '평가서 생성',
     },
     children: [],
+  },
+  {
+    path: '/evaluation/form/edit/:id',
+    name: 'editevaluationform',
+    component: () => import('@/views/evaluation/EditEvaluationForm.vue'),
+    meta: {
+      title: '평가서 수정',
+    },
+    children: [],
+  },
+  {
+    path: '/evaluation/evaluate/:id',
+    name: 'evaluateevaluationform',
+    component: () => import('@/views/evaluation/EvaluateEvaluationForm.vue'),
+    meta: {
+      title: '평가서 평가',
+    },
+    children: [],
   }
 ];
 

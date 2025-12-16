@@ -83,17 +83,34 @@ import { useRouter } from 'vue-router'
 import apiClient from '@/api/apiClient'
 import Editor from "@toast-ui/editor"
 import "@toast-ui/editor/dist/toastui-editor.css"
+import { useAuthStore } from '@/stores/auth';
 
 // useRouter()를 router 변수로 정의 (외부 로직)
 const router = useRouter()
+const authStore = useAuthStore();
 
 // Reactive 데이터
 const guideName = ref('')
-const creator = ref('김인사')
-const employeeId = ref(8);
-const departmentId = ref<number>(2);
-const departmentName = ref('인사팀')
+const creator = ref('')
+const employeeId = ref();
+const departmentId = ref<number>();
+const departmentName = ref('')
 const guideContent = ref('')
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 // 평가 가이드 내용을 기입할 때 사용되는 에디터 참조 데이터
 const editorRef = ref<HTMLDivElement | null>(null)
@@ -145,6 +162,11 @@ const saveGuide = async () => {
  * 설명 : 페이지 마운트 시, 평가 가이드의 내용을 기입하기 위한 에디터 객체를 생성하는 생명주기(onMounted) 훅
  */
 onMounted(async () => {
+  employeeId.value = authEmployeeId.value
+  creator.value = authEmployeeName.value
+  departmentId.value = authDepartmentId.value
+  departmentName.value = authDepartmentName.value
+
   //페이지가 렌더링 될 때까지 기다리는데 필요한 코드
   await nextTick()
 
@@ -279,11 +301,11 @@ onMounted(async () => {
 }
 
 .employee-input {
-  width: 400px;
+  width: 550px;
 }
 
 .department-input {
-  width: 420px;
+  width: 550px;
 }
 
 .back-icon {

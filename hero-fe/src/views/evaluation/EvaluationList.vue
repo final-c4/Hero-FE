@@ -58,7 +58,11 @@
 
               <!-- 평가 생성 -->
               <div class="col action">
-                <button class="btn-create" @click="goToCreate(item.evaluationTemplateTemplateId)">
+                <button
+                  class="btn-create"
+                  :disabled="authGradeId !== 6"
+                  @click="authGradeId === 6 && goToCreate(item.evaluationTemplateTemplateId)"
+                >
                   <img class="document-icon" src="/images/document.svg" />
                   평가 생성
                 </button>
@@ -99,9 +103,11 @@
 import apiClient from '@/api/apiClient';
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthStore } from '@/stores/auth';
 
 //외부 로직
 const router = useRouter();
+const authStore = useAuthStore();
 
 // 페이지네이션 타입
 interface PageResponse<T> {
@@ -158,6 +164,20 @@ const errorMessage = ref("");
 const currentPage = ref(0)
 const pageSize = ref(10)
 const totalPages = ref(0)
+
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
 
 /**
  * 설명: 평가 템플릿 목록 조회 메소드
@@ -405,5 +425,10 @@ onMounted(async () => {
   background: #155dfc;
   border: none;
   color: #fff;
+}
+
+.btn-create:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>
