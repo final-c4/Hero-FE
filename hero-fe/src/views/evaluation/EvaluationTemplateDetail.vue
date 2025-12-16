@@ -21,9 +21,10 @@
         <h1 class="title">평가 템플릿 상세</h1>
       </div>
 
-      <button class="btn-remove" @click="deleteTemplate">
-        <span>삭제</span>
-      </button>
+      <div class="btn-container">
+        <button class="btn-edit" @click="goToEdit">수정</button>
+        <button class="btn-remove" @click="deleteTemplate">삭제</button>
+      </div>
     </div>
 
     <!--평가 템플릿 세부 페이지 내용-->
@@ -128,7 +129,6 @@
             </div>
           </section>
         </div>
-
       </div>
     </div>
   </div>
@@ -138,11 +138,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import axios from "axios";
+import apiClient from "@/api/apiClient";
+import { useAuthStore } from '@/stores/auth';
 
 // useRouter()를 router 변수로 정의, useRoute()를 route 변수로 정의 (외부 로직)
 const route = useRoute();
 const router = useRouter();
+const authStore = useAuthStore();
 
 //URL의 /:id를 templateId 변수로 정의
 const templateId = route.params.id;
@@ -150,12 +152,26 @@ const templateId = route.params.id;
 // Reactive 데이터
 const template = ref<any>(null);
 
+const authEmployeeId = ref();
+const authEmployeeName = ref();
+const authDepartmentId = ref();
+const authDepartmentName = ref();
+const authGradeId = ref();
+const authGradeName = ref();
+
+authEmployeeId.value = authStore.user?.employeeId
+authEmployeeName.value = authStore.user?.employeeName
+authDepartmentId.value = authStore.user?.departmentId
+authDepartmentName.value = authStore.user?.departmentName
+authGradeId.value = authStore.user?.gradeId
+authGradeName.value = authStore.user?.gradeName
+
 /**
  * 설명 : 평가 템플릿 상세 데이터 조회 메소드
  */
 const getTemplateDetail = async () => {
-  const res = await axios.get(
-    `http://localhost:8080/api/eval/evaluation-template/select/${templateId}`
+  const res = await apiClient.get(
+    `/evaluation/evaluation-template/select/${templateId}`
   );
   template.value = res.data;
 };
@@ -176,6 +192,17 @@ const formatDate = (date: string | null) => {
 const goBack = () => router.back();
 
 /**
+ * 설명 : 수정 페이지로 이동
+ */
+const goToEdit = () => {
+  if(authDepartmentId.value != 2){
+    alert("인사팀이 아니라서 수정할 수 없습니다.")
+    goBack();
+  }
+  router.push(`/evaluation/template/edit/${templateId}`);
+};
+
+/**
  * 설명 : 평가 템플릿 제거 메소드
  */
 const deleteTemplate = async () => {
@@ -183,12 +210,12 @@ const deleteTemplate = async () => {
   if (!confirmDelete) return;
 
   try {
-    await axios.delete(
-      `http://localhost:8080/api/public/evaluation-template/delete/${templateId}`
+    await apiClient.delete(
+      `/evaluation/evaluation-template/delete/${templateId}`
     );
 
     alert("평가 템플릿이 삭제되었습니다.");
-    router.back(); // ✅ 삭제 후 이전 페이지로 이동
+    router.back();
 
   } catch (error) {
     console.error("삭제 실패:", error);
@@ -230,13 +257,19 @@ onMounted(() => {
   flex-direction: column;
   width: 100%;
   background: #f5f6fa;
+  min-height: 0;
+  flex: 1;       
+  height: 100%;
 }
 
 .content {
   width: 100%;
   padding: 24px;
-  display: flex;
+  display: block;
   justify-content: center; 
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 
 .form-box {
@@ -281,6 +314,16 @@ onMounted(() => {
   border-radius: 10px;
   border: none;
   cursor: pointer;
+}
+
+.btn-edit {
+  background: #4b89dc;
+  color: white;
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .form-item {
@@ -560,5 +603,10 @@ label {
 
 .back-icon {
     cursor: pointer;
+}
+
+.btn-container {
+  display:flex; 
+  gap:10px;
 }
 </style>
