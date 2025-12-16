@@ -1,6 +1,6 @@
 /**
  * <pre>
- * File Name: notificationStore.ts
+ * TypeScript Name: notificationStore
  * Description: 알림 전역 상태 관리 (Pinia Store)
  *
  * History
@@ -9,14 +9,14 @@
  * </pre>
  *
  * @author 혜원
- * @version 2.1
+ * @version 2.2
  */
 
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { notificationApi } from '@/api/notification/notificationApi';
 import { useAuthStore } from '@/stores/auth';
-import { useNotificationSocket } from '@/composables/notification/useNotificationSocket';  // ⭐ 추가
+import { useNotificationSocket } from '@/composables/notification/useNotificationSocket';
 import type { 
   Notification, 
   NotificationDTO, 
@@ -50,7 +50,7 @@ export const useNotificationStore = defineStore('notification', () => {
       isLoading.value = true;
       error.value = null;
       
-      const data = await notificationApi.getNotifications(employeeId.value);
+      const data = await notificationApi.findNotifications(employeeId.value);
       
       // 삭제되지 않은 알림만 필터링
       notifications.value = data
@@ -72,7 +72,7 @@ export const useNotificationStore = defineStore('notification', () => {
     if (!employeeId.value) return;
 
     try {
-      unreadCount.value = await notificationApi.getUnreadCount(employeeId.value);
+      unreadCount.value = await notificationApi.findUnreadCount(employeeId.value);
     } catch (err) {
       console.error('미읽은 알림 개수 조회 실패:', err);
     }
@@ -88,7 +88,7 @@ export const useNotificationStore = defineStore('notification', () => {
       isLoading.value = true;
       error.value = null;
       
-      const data = await notificationApi.getDeletedNotifications(employeeId.value);
+      const data = await notificationApi.findDeletedNotifications(employeeId.value);
       deletedNotifications.value = data.map(mapDTOToNotification);
       
     } catch (err) {
@@ -106,7 +106,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   const markAsRead = async (notificationId: number): Promise<void> => {
     try {
-      await notificationApi.markAsRead(notificationId);
+      await notificationApi.modifyIsRead(notificationId);
       
       // 로컬 상태 업데이트
       const notification = notifications.value.find(n => n.notificationId === notificationId);
@@ -128,7 +128,7 @@ export const useNotificationStore = defineStore('notification', () => {
     if (!employeeId.value) return;
 
     try {
-      await notificationApi.markAllAsRead(employeeId.value);
+      await notificationApi.modifyAllIsRead(employeeId.value);
       
       // 로컬 상태 업데이트
       const now = new Date().toISOString();
@@ -151,7 +151,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   const softDeleteNotification = async (notificationId: number): Promise<void> => {
     try {
-      await notificationApi.softDelete(notificationId);
+      await notificationApi.softRemove(notificationId);
       
       // 일반 목록에서 제거
       const index = notifications.value.findIndex(n => n.notificationId === notificationId);
@@ -183,7 +183,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   const restoreNotification = async (notificationId: number): Promise<void> => {
     try {
-      await notificationApi.restore(notificationId);
+      await notificationApi.modifyRestore(notificationId);
       
       // 삭제된 목록에서 제거
       const index = deletedNotifications.value.findIndex(n => n.notificationId === notificationId);
@@ -215,7 +215,7 @@ export const useNotificationStore = defineStore('notification', () => {
    */
   const hardDeleteNotification = async (notificationId: number): Promise<void> => {
     try {
-      await notificationApi.hardDelete(notificationId);
+      await notificationApi.removeNotification(notificationId);
       
       // 삭제된 목록에서 완전히 제거
       const index = deletedNotifications.value.findIndex(n => n.notificationId === notificationId);
@@ -328,7 +328,7 @@ export const useNotificationStore = defineStore('notification', () => {
       notifications.value.unshift(formattedNotification);
       unreadCount.value++;
 
-      // 브라우저 알림 표시 (선택사항)
+      // 브라우저 알림 표시
       showBrowserNotification(formattedNotification);
     });
   };
@@ -345,7 +345,6 @@ export const useNotificationStore = defineStore('notification', () => {
    * 브라우저 알림 표시
    */
   const showBrowserNotification = (notification: Notification): void => {
-    // 브라우저 알림 권한 확인
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(notification.title, {
         body: notification.message,
@@ -362,7 +361,7 @@ export const useNotificationStore = defineStore('notification', () => {
     unreadCount,
     isLoading,
     error,
-    isConnected,  // WebSocket 연결 상태 추가
+    isConnected,
     
     // Actions - Query
     fetchNotifications,
