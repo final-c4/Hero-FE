@@ -34,7 +34,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationDTO[]>} 알림 목록
    */
   findNotifications: async (employeeId: number): Promise<NotificationDTO[]> => {
-    const response = await apiClient.get(`/notification/${employeeId}`);
+    const response = await apiClient.get(`/notifications/${employeeId}`);
     return response.data;
   },
 
@@ -44,7 +44,7 @@ export const notificationApi = {
    * @returns {Promise<number>} 미읽은 알림 개수
    */
   findUnreadCount: async (employeeId: number): Promise<number> => {
-    const response = await apiClient.get(`/notification/${employeeId}/unread-count`);
+    const response = await apiClient.get(`/notifications/${employeeId}/unread-count`);
     return response.data;
   },
 
@@ -54,7 +54,7 @@ export const notificationApi = {
    * @returns {Promise<void>}
    */
   modifyIsRead: async (notificationId: number): Promise<void> => {
-    await apiClient.patch(`/notification/${notificationId}/read`);
+    await apiClient.patch(`/notifications/${notificationId}/read`);
   },
 
   /**
@@ -63,7 +63,7 @@ export const notificationApi = {
    * @returns {Promise<void>}
    */
   modifyAllIsRead: async (employeeId: number): Promise<void> => {
-    await apiClient.patch(`/notification/${employeeId}/read-all`);
+    await apiClient.patch(`/notifications/${employeeId}/read-all`);
   },
 
   /**
@@ -72,7 +72,7 @@ export const notificationApi = {
    * @returns {Promise<void>}
    */
   softRemove: async (notificationId: number): Promise<void> => {
-    await apiClient.patch(`/notification/${notificationId}/delete`);
+    await apiClient.patch(`/notifications/${notificationId}/delete`);
   },
 
   /**
@@ -81,7 +81,7 @@ export const notificationApi = {
    * @returns {Promise<void>}
    */
   modifyRestore: async (notificationId: number): Promise<void> => {
-    await apiClient.patch(`/notification/${notificationId}/restore`);
+    await apiClient.patch(`/notifications/${notificationId}/restore`);
   },
 
   /**
@@ -90,7 +90,7 @@ export const notificationApi = {
    * @returns {Promise<void>}
    */
   removeNotification: async (notificationId: number): Promise<void> => {
-    await apiClient.delete(`/notification/${notificationId}`);
+    await apiClient.delete(`/notifications/${notificationId}`);
   },
 
   /**
@@ -99,7 +99,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationDTO[]>} 삭제된 알림 목록
    */
   findDeletedNotifications: async (employeeId: number): Promise<NotificationDTO[]> => {
-    const response = await apiClient.get(`/notification/${employeeId}/deleted`);
+    const response = await apiClient.get(`/notifications/${employeeId}/deleted`);
     return response.data;
   },
 
@@ -109,7 +109,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationSettingsDTO>} 알림 설정
    */
   findSettings: async (employeeId: number): Promise<NotificationSettingsDTO> => {
-    const response = await apiClient.get(`/notification/settings/${employeeId}`);
+    const response = await apiClient.get(`/notifications/settings/${employeeId}`);
     return response.data;
   },
 
@@ -120,7 +120,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationSettingsDTO>} 수정된 설정
    */
   modifySettings: async (employeeId: number, settings: NotificationSettingsDTO): Promise<NotificationSettingsDTO> => {
-    const response = await apiClient.put(`/notification/settings/${employeeId}`, settings);
+    const response = await apiClient.put(`/notifications/settings/${employeeId}`, settings);
     return response.data;
   },
 };
