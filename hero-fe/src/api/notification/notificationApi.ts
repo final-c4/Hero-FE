@@ -109,7 +109,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationSettingsDTO>} 알림 설정
    */
   findSettings: async (employeeId: number): Promise<NotificationSettingsDTO> => {
-    const response = await apiClient.get(`/notification-settings/${employeeId}`);
+    const response = await apiClient.get(`/notification/settings/${employeeId}`);
     return response.data;
   },
 
@@ -120,7 +120,7 @@ export const notificationApi = {
    * @returns {Promise<NotificationSettingsDTO>} 수정된 설정
    */
   modifySettings: async (employeeId: number, settings: NotificationSettingsDTO): Promise<NotificationSettingsDTO> => {
-    const response = await apiClient.put(`/notification-settings/${employeeId}`, settings);
+    const response = await apiClient.put(`/notification/settings/${employeeId}`, settings);
     return response.data;
   },
 };
