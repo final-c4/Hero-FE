@@ -528,6 +528,13 @@ const handleSubMenuClick = (key: string) => {
     router.push('/payroll/admin/policy');          // 급여 정책/설정 관리
   }
 
+  // 휴가/연차
+  else if (key === 'vacationHistory') {
+    router.push('/vacation/history');
+  } else if (key === 'vacationDept') {
+    router.push('/vacation/department');
+  }
+
   // 설정 관리 하위 메뉴 라우팅
   if(key === 'department'){
     router.push ('/settings/department');
