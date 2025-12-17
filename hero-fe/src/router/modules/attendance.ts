@@ -88,7 +88,7 @@ const attendanceRoutes: RouteRecordRaw[] = [
         name: 'DepartmentAttendanceRecord',
         component: () =>
           import(
-            '@/views/attendance/department_attendance_record/index.vue'
+            '@/views/attendance/department_attendance_record/Index.vue'
           ),
         meta: { title: '부서 근태 현황' },
       },
