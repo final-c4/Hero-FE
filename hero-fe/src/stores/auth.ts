@@ -66,8 +66,6 @@ export const useAuthStore = defineStore('auth', () => {
      */
     function login(token: string) {
         try {
-            // const decoded = jwtDecode<JwtPayload>(token);
-
             accessToken.value = token;
             user.value = jwtDecode<JwtPayload>(token);
 
