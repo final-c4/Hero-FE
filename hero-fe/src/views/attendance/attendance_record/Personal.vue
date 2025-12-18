@@ -92,8 +92,8 @@
             근무제 변경 이력
           </RouterLink>
         </div>
-  
-        <!-- 검색 영역 (기간 필터) -->
+      <div class="panel-body">
+                <!-- 검색 영역 (기간 필터) -->
         <div class="panel-search">
           <div class="panel-search-inner">
             <!-- 기간(시작) -->
@@ -105,7 +105,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
   
@@ -118,7 +117,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
   
@@ -159,7 +157,8 @@
                       class="status-pill"
                       :class="{
                         'status-normal': row.state === '정상',
-                        'status-late': row.state === '지각'
+                        'status-late': row.state === '지각',
+                        'status-absent': row.state === '결근'
                       }"
                     >
                       {{ row.state }}
@@ -169,7 +168,7 @@
                   <td>{{ formatTime(row.startTime) }}</td>
                   <td>{{ formatTime(row.endTime) }}</td>
   
-                  <td>{{ row.workDuration }}</td>
+                  <td>{{ row.workDuration }}분</td>
   
                   <td>{{ row.workSystemName }}</td>
   
@@ -215,6 +214,7 @@
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -319,7 +319,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 36px;
-  overflow-y: auto; 
 }
 
 /* 상단 요약 카드 */
@@ -369,17 +368,19 @@ onMounted(() => {
 /* 메인 패널 */
 .panel {
   width: 100%;
-  background: #ffffff;
+  /* background: #ffffff; */
   border-radius: 14px;
-  border: 2px solid #e2e8f0;
+  /* border: 2px solid #e2e8f0; */
   display: flex;
   flex-direction: column;
 }
 
 /* 탭 영역 */
 .panel-tabs {
-  display: inline-flex;
-  border-bottom: 1px solid #e2e8f0;
+  /* display: inline-flex; */
+  display: flex;
+  flex-direction: row;
+  /* border-bottom: 1px solid #e2e8f0; */
 }
 
 .tab {
@@ -397,6 +398,8 @@ onMounted(() => {
   text-decoration: none;
 }
 
+
+
 .tab-left {
   border-left: 2px solid #e2e8f0;
   border-top-left-radius: 14px;
@@ -412,17 +415,24 @@ onMounted(() => {
   font-weight: 700;
 }
 
+.panel-body{
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+}
+
 /* 검색 영역 */
 .panel-search {
-  border-top: 2px solid #e2e8f0;
-  border-bottom: 2px solid #e2e8f0;
+  /* border-top: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e2e8f0; */
+  border-left: 2px solid #e2e8f0;
+  border-right: 2px solid #e2e8f0;
   padding: 14px 18px;
 }
 
 .panel-search-inner {
   display: flex;
   justify-content: flex-end;
-  align-items: center;
+  align-items: flex-end;
   gap: 8px;
 }
 
@@ -491,25 +501,27 @@ tbody tr.row-striped {
 
 /* 상태 pill */
 .status-pill {
-  display: inline-flex;
+  display: inline;
   align-items: center;
   justify-content: center;
   min-width: auto;
-  height: 24px;
+  height: auto;
   border-radius: 999px;
   font-size: 12px;
-  padding: 0 4px;
+  padding: 0;
+  background: none;
 }
 
 .status-normal {
-  background: #ffffff;
   color: #000000;
 }
 
 .status-late {
-  background: #f8fafc;
   color: #ff0000;
 }
+.status-absent  { 
+  color: #16a34a;; 
+} 
 
 /* 링크 스타일 버튼 */
 .link-button {
@@ -575,7 +587,7 @@ tbody tr.row-striped {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-bottom: 2px;          
+  padding-bottom: 0px;          
 }
 
 /* 날짜 필터 그룹 */
@@ -594,7 +606,7 @@ tbody tr.row-striped {
 .date-input-wrapper {
   display: flex;
   align-items: center;
-  width: 260px;
+  width: 220px;
   height: 40px;
   border-radius: 10px;
   border: 2px solid #cad5e2;
@@ -670,5 +682,6 @@ tbody tr.row-striped {
   transform: translateY(1px);
   box-shadow: none;
 }
+
 
 </style>

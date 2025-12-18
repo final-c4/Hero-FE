@@ -88,7 +88,8 @@
           </RouterLink>
         </div>
 
-        <!-- 검색 영역 (기간 필터 UI) -->
+      <div class="panel-body">
+                  <!-- 검색 영역 (기간 필터 UI) -->
         <div class="panel-search">
           <div class="panel-search-inner">
             <!-- 기간(시작) -->
@@ -100,7 +101,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -113,7 +113,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -191,6 +190,7 @@
               다음
             </button>
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -365,17 +365,17 @@ const formatTime = (time?: string | null): string => {
 /* 메인 패널 */
 .panel {
   width: 100%;
-  background: #ffffff;
+  /* background: #ffffff; */
   border-radius: 14px;
-  border: 2px solid #e2e8f0;
+  /* border: 2px solid #e2e8f0; */
   display: flex;
   flex-direction: column;
 }
 
 /* 탭 영역 */
 .panel-tabs {
-  display: inline-flex;
-  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: row;
 }
 
 .tab {
@@ -408,10 +408,15 @@ const formatTime = (time?: string | null): string => {
   font-weight: 700;
 }
 
+.panel-body{
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+}
+
 /* 검색 영역 */
 .panel-search {
-  border-top: 2px solid #e2e8f0;
-  border-bottom: 2px solid #e2e8f0;
+  border-left: 2px solid #e2e8f0;
+  border-right: 2px solid #e2e8f0;
   padding: 14px 18px;
 }
 
@@ -419,14 +424,14 @@ const formatTime = (time?: string | null): string => {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  gap: 16px;
+  gap: 8px;
 }
 
 .search-button-group {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-bottom: 2px;
+  padding-bottom: 0px;
 }
 
 /* 날짜 필터 그룹 */
@@ -525,7 +530,7 @@ const formatTime = (time?: string | null): string => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 18px 0 18px;
+  padding: 0px 0 18px;
   gap: 20px;
 }
 
@@ -605,7 +610,9 @@ const formatTime = (time?: string | null): string => {
   color: #e7000b;
 }
 
-
+.attendance-table td.worksystem-name{
+   color: #e7000b;
+}
 
 </style>
 

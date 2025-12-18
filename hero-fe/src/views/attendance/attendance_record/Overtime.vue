@@ -87,8 +87,8 @@
             근무제 변경 이력
           </RouterLink>
         </div>
-
-        <!-- 검색 영역(기간 필터) -->
+      <div class="panel-body">
+                <!-- 검색 영역(기간 필터) -->
         <div class="panel-search">
           <div class="panel-search-inner">
             <!-- 기간(시작) -->
@@ -100,7 +100,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -113,7 +112,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -185,6 +183,7 @@
             </button>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -316,11 +315,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
-/* TODO: attendance-wrapper / attendance-page / panel 등
-   BEM 네이밍으로 점진적 리팩터링 예정 */
-</style>
-
 
 <style scoped>
 .attendance-wrapper {
@@ -388,17 +382,17 @@ onMounted(() => {
 /* 메인 패널 */
 .panel {
   width: 100%;
-  background: #ffffff;
+  /* background: #ffffff; */
   border-radius: 14px;
-  border: 2px solid #e2e8f0;
+  /* border: 2px solid #e2e8f0; */
   display: flex;
   flex-direction: column;
 }
 
 /* 탭 영역 */
 .panel-tabs {
-  display: inline-flex;
-  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: row;
 }
 
 .tab {
@@ -431,10 +425,15 @@ onMounted(() => {
   font-weight: 700;
 }
 
+.panel-body{
+  border: 1px solid #e2e8f0;
+  background-color: #ffffff;
+}
+
 /* 검색 영역 */
 .panel-search {
-  border-top: 2px solid #e2e8f0;
-  border-bottom: 2px solid #e2e8f0;
+  border-left: 2px solid #e2e8f0;
+  border-right: 2px solid #e2e8f0;
   padding: 14px 18px;
 }
 
@@ -442,7 +441,7 @@ onMounted(() => {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  gap: 16px;
+  gap: 8px;
 }
 
 .search-input {
@@ -475,7 +474,7 @@ onMounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 18px 0 18px;
+  padding: 0px 0 18px;
   gap: 20px;
 }
 
@@ -519,7 +518,7 @@ onMounted(() => {
 }
 
 /* 초과 근무 시간 강조 색상 */
-.overtime-time {
+.attendance-table td.overtime-time {
   color: #e7000b;
 }
 
@@ -565,7 +564,7 @@ onMounted(() => {
 .date-input-wrapper {
   display: flex;
   align-items: center;
-  width: 260px;
+  width: 220px;
   height: 40px;
   border-radius: 10px;
   border: 2px solid #cad5e2;
@@ -602,7 +601,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding-bottom: 2px;
+  padding-bottom: 0px;
 }
 
 .btn-search,

@@ -30,7 +30,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -43,7 +42,6 @@
                   type="date"
                   class="date-input"
                 />
-                <span class="date-icon">📅</span>
               </div>
             </div>
 
@@ -495,7 +493,7 @@ onMounted(async () => {
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
-  gap: 16px;
+  gap: 8px;
 }
 
 /* 날짜 필터 그룹 */
