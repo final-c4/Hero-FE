@@ -1,6 +1,6 @@
 <!-- 
   <pre>
-  (File => TypeScript / Vue) Name   : AttendancePersonal.vue
+  TypeScript Name   : AttendancePersonal.vue
   Description : 개인 근태 이력 페이지
                 - 상단 요약 카드로 이번 달 근태 현황 요약
                 - 탭을 통해 개인 근태 / 초과 근무 / 근태 정정 / 근무제 변경 이력 이동
@@ -11,7 +11,7 @@
   </pre>
 
   @author 이지윤
-  @version 1.0
+  @version 1.1
 -->
 
 <template>
@@ -23,7 +23,7 @@
         <div class="summary-card">
           <div class="summary-title">이번 달 근무일</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">15</span>
+            <span class="summary-value">{{ workDays }}</span>
             <span class="summary-unit">시간</span>
           </div>
         </div>
@@ -31,14 +31,16 @@
         <div class="summary-card">
           <div class="summary-title">오늘 근무</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">기본근무제</span>
+            <span class="summary-value">
+              {{ todayWorkSystemName || '근무 정보 없음' }}
+            </span>
           </div>
         </div>
   
         <div class="summary-card">
           <div class="summary-title">이번 달 지각</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">2</span>
+            <span class="summary-value">{{ lateCount }}</span>
             <span class="summary-unit">회</span>
           </div>
         </div>
@@ -46,7 +48,7 @@
         <div class="summary-card">
           <div class="summary-title">이번 달 결근</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">0</span>
+            <span class="summary-value">{{ absentCount }}</span>
             <span class="summary-unit">회</span>
           </div>
         </div>
@@ -104,6 +106,7 @@
                   v-model="startDate"
                   type="date"
                   class="date-input"
+                  :max="today"
                 />
               </div>
             </div>
@@ -116,6 +119,7 @@
                   v-model="endDate"
                   type="date"
                   class="date-input"
+                  :max="today"
                 />
               </div>
             </div>
@@ -224,12 +228,13 @@
 import { onMounted } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
 import { storeToRefs } from 'pinia';
-
 import { useAttendanceStore } from '@/stores/attendance/attendanceStore';
 
 // 4. Store & Router
 const attendanceStore = useAttendanceStore();
 const route = useRoute();
+
+const today = new Date().toISOString().slice(0, 10);
 
 // 5. Reactive State (Pinia → storeToRefs)
 const {
@@ -238,6 +243,10 @@ const {
   endDate,
   currentPage,
   totalPages,
+  workDays,
+  todayWorkSystemName,
+  lateCount,
+  absentCount
 } = storeToRefs(attendanceStore);
 
 /**
@@ -299,6 +308,8 @@ const onReset = (): void => {
 onMounted(() => {
   // 초기 진입 시 1페이지 데이터 조회
   attendanceStore.fetchPersonal(1);
+
+  attendanceStore.fetchPersonalSummary();
 });
 </script>
 
@@ -308,7 +319,6 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: auto;
 }
 
 .attendance-page {
@@ -319,6 +329,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 36px;
+  overflow-y: auto;
 }
 
 /* 상단 요약 카드 */
