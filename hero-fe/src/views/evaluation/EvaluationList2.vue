@@ -177,7 +177,7 @@ const fetchEvaluations = async () => {
     loading.value = true;
 
     const res = await apiClient.get<PageResponse<any>>(
-      "/evaluation/evaluation/selectall",
+      "/evaluation/evaluation/all",
       {
         params: {
           page: currentPage.value,
@@ -312,7 +312,7 @@ const deleteEvaluation = async (evaluationId: number) => {
   }
 
   try {
-    await apiClient.delete(`/evaluation/evaluation/delete/${evaluationId}`);
+    await apiClient.delete(`/evaluation/evaluation/${evaluationId}`);
 
     alert("평가가 삭제되었습니다.");
 

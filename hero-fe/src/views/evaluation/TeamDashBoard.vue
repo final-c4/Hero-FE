@@ -76,7 +76,7 @@ const loadDashboard = async () => {
   const departmentId = authStore.user?.departmentId;
 
   const { data } = await apiClient.get(
-    `/evaluation/dashboard/select/${departmentId}`
+    `/evaluation/dashboard/${departmentId}`
   );
 
   if (!data || data.length === 0) {
