@@ -102,42 +102,37 @@
           </RouterLink>
         </div>
       <div class="panel-body">
-                <!-- 검색 영역 (기간 필터) -->
+        <!-- 검색 영역 (기간 필터) -->
         <div class="panel-search">
           <div class="panel-search-inner">
-            <!-- 기간(시작) -->
-            <div class="date-filter-group">
-              <span class="date-label">기간(시작)</span>
-              <div class="date-input-wrapper">
-                <input
-                  v-model="startDate"
-                  type="date"
-                  class="date-input"
-                  :max="today"
-                />
-              </div>
+            <!-- 왼쪽: 조회기간 + 날짜 범위 (전자결재와 동일한 형태) -->
+            <div class="filter-row">
+              <span class="filter-label">조회기간</span>
+              <input
+                v-model="startDate"
+                type="date"
+                class="filter-input"
+                :max="today"
+              />
+
+              <span class="filter-separator">~</span>
+
+              <input
+                v-model="endDate"
+                type="date"
+                class="filter-input"
+                :max="today"
+              />
             </div>
-  
-            <!-- 기간(종료) -->
-            <div class="date-filter-group">
-              <span class="date-label">기간(종료)</span>
-              <div class="date-input-wrapper">
-                <input
-                  v-model="endDate"
-                  type="date"
-                  class="date-input"
-                  :max="today"
-                />
-              </div>
-            </div>
-  
-            <!-- 검색 / 초기화 버튼 -->
+            <!-- 오른쪽: 검색 / 초기화 버튼 -->
             <div class="search-button-group">
               <button class="btn-search" @click="onSearch">검색</button>
               <button class="btn-reset" @click="onReset">초기화</button>
             </div>
           </div>
         </div>
+
+
   
         <!-- 테이블 영역 -->
         <div class="panel-table-wrapper">
@@ -462,18 +457,40 @@ onMounted(() => {
   gap: 8px;
 }
 
-.search-input {
-  width: 360px;
+/* 조회기간 + 날짜 범위 한 줄 정렬 */
+.filter-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+/* "조회기간" 텍스트 */
+.filter-label {
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* 날짜 인풋 (전자결재 페이지와 비슷한 스타일) */
+.filter-input {
+  width: 220px;
   height: 40px;
   border-radius: 10px;
   border: 2px solid #cad5e2;
+  background: #ffffff;
   padding: 0 12px;
   font-size: 14px;
   color: #1f2933;
 }
 
-.search-input::placeholder {
-  color: #9ca3af;
+.filter-input:focus {
+  outline: none;
+}
+
+/* ~ 구분자 */
+.filter-separator {
+  font-size: 14px;
+  color: #64748b;
 }
 
 
@@ -634,53 +651,6 @@ tbody tr.row-striped {
   padding-bottom: 0px;          
 }
 
-/* 날짜 필터 그룹 */
-.date-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.date-label {
-  font-size: 13px;
-  color: #64748b;
-}
-
-/* 인풋 + 캘린더 아이콘 */
-.date-input-wrapper {
-  display: flex;
-  align-items: center;
-  width: 220px;
-  height: 40px;
-  border-radius: 10px;
-  border: 2px solid #cad5e2;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.date-input {
-  flex: 1;
-  border: none;
-  height: 100%;
-  padding: 0 12px;
-  font-size: 14px;
-  color: #1f2933;
-}
-
-.date-input:focus {
-  outline: none;
-}
-
-.date-icon {
-  width: 40px;
-  height: 100%;
-  border-left: 1px solid #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  color: #94a3b8;
-}
 
 .btn-search,
 .btn-reset {
@@ -726,6 +696,5 @@ tbody tr.row-striped {
   transform: translateY(1px);
   box-shadow: none;
 }
-
 
 </style>

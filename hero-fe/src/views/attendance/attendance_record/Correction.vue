@@ -102,33 +102,26 @@
                   <!-- 검색 영역 -->
         <div class="panel-search">
           <div class="panel-search-inner">
-            <!-- 기간(시작) -->
-            <div class="date-filter-group">
-              <span class="date-label">기간(시작)</span>
-              <div class="date-input-wrapper">
-                <input
-                  v-model="startDate"
-                  type="date"
-                  class="date-input"
-                  :max="today"
-                />
-              </div>
-            </div>
+            <!-- 왼쪽: 조회기간 + 날짜 범위 (전자결재와 동일한 형태) -->
+            <div class="filter-row">
+              <span class="filter-label">조회기간</span>
+              <input
+                v-model="startDate"
+                type="date"
+                class="filter-input"
+                :max="today"
+              />
 
-            <!-- 기간(종료) -->
-            <div class="date-filter-group">
-              <span class="date-label">기간(종료)</span>
-              <div class="date-input-wrapper">
-                <input
-                  v-model="endDate"
-                  type="date"
-                  class="date-input"
-                  :max="today"
-                />
-              </div>
-            </div>
+              <span class="filter-separator">~</span>
 
-            <!-- 버튼 -->
+              <input
+                v-model="endDate"
+                type="date"
+                class="filter-input"
+                :max="today"
+              />
+            </div>
+            <!-- 오른쪽: 검색 / 초기화 버튼 -->
             <div class="search-button-group">
               <button class="btn-search" @click="onSearch">검색</button>
               <button class="btn-reset" @click="onReset">초기화</button>
@@ -477,35 +470,35 @@ const formatTime = (time?: string | null): string => {
 }
 
 /* 날짜 필터 그룹 */
-.date-filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.date-label {
+.filter-label {
   font-size: 13px;
   color: #64748b;
 }
 
-.date-input-wrapper {
-  display: flex;
-  align-items: center;
+/* 날짜 인풋 (전자결재 페이지와 비슷한 스타일) */
+.filter-input {
   width: 220px;
   height: 40px;
   border-radius: 10px;
   border: 2px solid #cad5e2;
   background: #ffffff;
-  overflow: hidden;
-}
-
-.date-input {
-  flex: 1;
-  border: none;
-  height: 100%;
   padding: 0 12px;
   font-size: 14px;
   color: #1f2933;
+}
+
+/* 조회기간 + 날짜 범위 한 줄 정렬 */
+.filter-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ~ 구분자 */
+.filter-separator {
+  font-size: 14px;
+  color: #64748b;
 }
 
 .date-input:focus {
