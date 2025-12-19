@@ -5,19 +5,19 @@
     </div>
 
     <div class="content-wrapper">
-      <div class="main-card">
-        <!-- 탭 메뉴 -->
-        <div class="tabs-container">
-          <button
-            v-for="tab in tabs"
-            :key="tab.id"
-            @click="changeTab(tab)"
-            :class="['tab-button', isActive(tab) ? 'active' : '']"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
+      <!-- 탭 메뉴 -->
+      <div class="tabs-container">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          @click="changeTab(tab)"
+          :class="['tab-button', isActive(tab) ? 'active' : '']"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
 
+      <div class="main-card">
         <!-- 탭 컨텐츠 -->
         <div class="content-container">
           <router-view />
@@ -92,13 +92,15 @@ onMounted(() => {
 .main-card {
   background: white;
   border-radius: 14px;
+  border-top-left-radius: 0;
   border: 1px solid #e2e8f0;
   min-height: 600px;
 }
 
 .tabs-container {
-  display: inline-flex;
-  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  margin-bottom: -1px;
+  z-index: 1;
 }
 
 .tab-button {
@@ -107,29 +109,26 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border-top: 2px solid #e2e8f0;
-  border-bottom: 2px solid #e2e8f0;
-  border-right: 2px solid #e2e8f0;
-  border-left: none;
+  background: white;
+  border: 1px solid #e2e8f0;
   font-size: 14px;
-  color: #62748e;
+  color: #0f172b;
   cursor: pointer;
 }
 
 .tab-button:first-child {
-  border-left: 2px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
   border-top-left-radius: 14px;
 }
 
 .tab-button:last-child {
   border-top-right-radius: 14px;
+  border-right: 1px solid #e2e8f0;
 }
 
 .tab-button.active {
   background: linear-gradient(180deg, #1c398e 0%, #162456 100%);
   color: white;
-  font-weight: 700;
 }
 
 .content-container {
