@@ -11,7 +11,7 @@
   </pre>
 
   @author 이지윤
-  @version 1.0
+  @version 1.1
 -->
 
 <template>
@@ -22,30 +22,40 @@
         <div class="summary-card">
           <div class="summary-title">이번 달 근무일</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">15</span>
-            <span class="summary-unit">시간</span>
+            <span class="summary-value">{{ workDays }}</span>
+            <span class="summary-unit">일</span>
           </div>
         </div>
-
+  
         <div class="summary-card">
           <div class="summary-title">오늘 근무</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">기본근무제</span>
+            <span class="summary-value">
+              {{ todayWorkSystemName || '근무 정보 없음' }}
+            </span>
           </div>
         </div>
-
+  
         <div class="summary-card">
           <div class="summary-title">이번 달 지각</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">2</span>
+            <span class="summary-value">{{ lateCount }}</span>
+            <span class="summary-unit">회</span>
+          </div>
+        </div>
+  
+        <div class="summary-card">
+          <div class="summary-title">이번 달 결근</div>
+          <div class="summary-value-wrapper">
+            <span class="summary-value">{{ absentCount }}</span>
             <span class="summary-unit">회</span>
           </div>
         </div>
 
         <div class="summary-card">
-          <div class="summary-title">이번 달 결근</div>
+          <div class="summary-title">이번 달 조퇴</div>
           <div class="summary-value-wrapper">
-            <span class="summary-value">0</span>
+            <span class="summary-value">{{ earlyCount }}</span>
             <span class="summary-unit">회</span>
           </div>
         </div>
@@ -100,6 +110,7 @@
                   v-model="startDate"
                   type="date"
                   class="date-input"
+                  :max="today"
                 />
               </div>
             </div>
@@ -112,6 +123,7 @@
                   v-model="endDate"
                   type="date"
                   class="date-input"
+                  :max="today"
                 />
               </div>
             </div>
@@ -204,11 +216,21 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { RouterLink, useRoute } from 'vue-router';
+import { storeToRefs } from 'pinia';
 
+import { useAttendanceStore } from '@/stores/attendance/attendanceStore'; // 상단 요약
 import { useCorrectionStore } from '@/stores/attendance/correction';
 
+
 const route = useRoute();
+const attendanceStore = useAttendanceStore();
 const correctionStore = useCorrectionStore();
+
+/**
+ * 오늘 날짜 (date input 최대값 제한용)
+ * 예: '2025-12-18'
+ */
+const today = new Date().toISOString().slice(0, 10);
 
 /**
  * 현재 활성화된 탭인지 확인합니다.
@@ -223,13 +245,27 @@ const isActiveTab = (name: string): boolean => {
   return route.name === name;
 };
 
-// 기간 인풋 (조회 조건)
-const startDate = ref<string>('');
-const endDate = ref<string>('');
+/**
+ * store 상태를 반응형으로 꺼냅니다.
+ * - attendanceStore: 상단 요약 카드
+ * - correctionStore: 수정 이력 리스트 + 필터 + 페이지네이션
+ */
+const {
+  workDays,
+  todayWorkSystemName,
+  lateCount,
+  absentCount,
+  earlyCount,
+} = storeToRefs(attendanceStore);
 
-// 페이지네이션 바인딩용 (store 값 그대로 사용)
-const currentPage = computed(() => correctionStore.currentPage);
-const totalPages = computed(() => correctionStore.totalPages);
+const {
+  correctionList,
+  startDate,
+  endDate,
+  currentPage,
+  totalPages,
+} = storeToRefs(correctionStore);
+
 
 /**
  * 근태 기록 수정 이력 페이지 진입 시 초기화 로직입니다.
@@ -328,7 +364,7 @@ const formatTime = (time?: string | null): string => {
 .summary-cards {
   display: flex;
   align-items: stretch;
-  gap: 20px;
+  gap: 10px;
 }
 
 .summary-card {

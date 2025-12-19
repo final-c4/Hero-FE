@@ -17,7 +17,6 @@
 <template>
   <div class="attendance-wrapper">
     <div class="attendance-page">
-
       <!-- 상단 요약 카드 4개 -->
       <div class="summary-cards">
         <div class="summary-card">
