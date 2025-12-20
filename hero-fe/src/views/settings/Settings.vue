@@ -41,6 +41,7 @@ const tabs = [
   { id: 'grade', label: '직급 관리', path: '/settings/grade' },
   { id: 'jobTitle', label: '직책 관리', path: '/settings/jobTitle' },
   { id: 'permission', label: '권한 관리', path: '/settings/permission' },
+  { id: 'approval', label: '결재 관리', path: '/settings/approval' },
 ];
 
 const changeTab = (tab: any) => {
