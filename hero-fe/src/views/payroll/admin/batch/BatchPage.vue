@@ -103,7 +103,7 @@ const goToCalculate = () => {
   width: 100%;
   background: #ffffff;
   border-radius: 14px;
-  border: 2px solid #fff;
+  border: 0px solid #fff;
   display: flex;
   flex-direction: column;
 }

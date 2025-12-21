@@ -198,7 +198,6 @@ const badgeClass = (s: PayrollBatchStatus) => {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  /* padding: 16px; */
   overflow-y: auto;
 }
 
@@ -208,7 +207,7 @@ const badgeClass = (s: PayrollBatchStatus) => {
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-  padding: 0px 10px 0px;
+  padding: 0px 20px 0px;
 }
 
 .left {

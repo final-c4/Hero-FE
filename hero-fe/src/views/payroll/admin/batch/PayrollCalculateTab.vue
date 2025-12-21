@@ -308,7 +308,6 @@ watch(
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 16px;
 }
 
 .panel-head {
@@ -317,6 +316,7 @@ watch(
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+  padding: 0px 20px 0px;
 }
 
 .left {
