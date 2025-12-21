@@ -82,7 +82,7 @@
             <td>{{ formatDateTime(b.closedAt) }}</td>
 
             <td @click.stop>
-              <!-- ✅ 확정 -->
+              <div class="action-buttons">
               <button
                 class="btn-primary small"
                 :disabled="store.selectedBatchId !== b.batchId || !canConfirm"
@@ -98,7 +98,6 @@
                 확정
               </button>
 
-              <!-- 지급 처리 (CONFIRMED -> PAID) -->
               <button
                 class="btn-primary small"
                 :disabled="store.selectedBatchId !== b.batchId || !canPay(b)"
@@ -117,6 +116,7 @@
               <button class="btn-secondary small" disabled title="추후 API 예정">
                 반려
               </button>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -385,5 +385,12 @@ th, td {
   margin-top: 10px;
   color: #b45309;
   font-size: 13px;
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
 }
 </style>
