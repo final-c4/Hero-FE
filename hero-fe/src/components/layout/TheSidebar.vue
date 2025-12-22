@@ -17,7 +17,7 @@
   </pre>
  
   @author 승건
-  @version 1.8
+  @version 2.0
  -->
 <template>
   <div :class="['sidebar-container', { collapsed: isCollapsed }]">
