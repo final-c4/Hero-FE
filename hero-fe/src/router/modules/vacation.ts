@@ -1,5 +1,5 @@
 /**
- * (File => TypeScript) Name   : vacation.routes.ts
+ * Typescript Name : vacation.routes.ts
  * Description : 휴가 도메인 라우트 설정
  *               - 개인 휴가 이력 페이지
  *               - 부서 휴가 현황(캘린더) 페이지
