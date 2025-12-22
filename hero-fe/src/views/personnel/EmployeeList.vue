@@ -80,8 +80,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { fetchEmployees as apiFetchEmployees, fetchEmployeeSearchOptions } from '@/api/personnel';
-import type { EmployeeListResponse, EmployeeSearchParams } from '@/types/personnel';
+import { fetchEmployees as apiFetchEmployees, fetchEmployeeSearchOptions } from '@/api/personnel/personnel';
+import type { EmployeeListResponse, EmployeeSearchParams } from '@/types/personnel/personnel';
 import EmployeeDetailModal from './EmployeeDetailModal.vue';
 
 // --- 상태(State) ---
