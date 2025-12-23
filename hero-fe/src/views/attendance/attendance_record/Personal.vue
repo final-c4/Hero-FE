@@ -132,8 +132,6 @@
           </div>
         </div>
 
-
-  
         <!-- 테이블 영역 -->
         <div class="panel-table-wrapper">
           <div class="panel-table">
@@ -447,8 +445,6 @@ onMounted(() => {
 
 /* 검색 영역 */
 .panel-search {
-  /* border-top: 2px solid #e2e8f0;
-  border-bottom: 2px solid #e2e8f0; */
   border-left: 1px solid #e2e8f0;
   border-right: 1px solid #e2e8f0;
   padding: 14px 18px;
