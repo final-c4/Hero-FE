@@ -527,20 +527,25 @@ onMounted(async () => {
 .panel-search-inner {
   display: flex;
   justify-content: flex-end;
-  align-items: flex-end;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
 }
 
 /* 날짜 필터 그룹 */
 .date-filter-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;  
+  align-items: center;   
+  gap: 10px;            
 }
 
+/* 날짜 라벨 */
 .date-label {
   color: #64748b;
+  white-space: nowrap;   
+  margin: 0;             
 }
+
 
 /* 인풋 + 캘린더 아이콘 */
 .date-input-wrapper {

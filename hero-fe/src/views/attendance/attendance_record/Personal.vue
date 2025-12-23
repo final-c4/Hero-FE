@@ -508,7 +508,7 @@ onMounted(() => {
 
 .panel-table {
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   overflow: hidden;
 }
 
