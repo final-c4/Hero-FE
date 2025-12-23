@@ -21,6 +21,7 @@
                   v-model="selectedDate"
                   type="date"
                   class="date-input"
+                  :max="today"
                 />
 
               </div>
@@ -158,6 +159,8 @@ import {
   type DeptWorkSystemRowDTO,
 } from '@/stores/attendance/deptWorkSystem'
 import { useAuthStore } from '@/stores/auth'
+
+const today = new Date().toISOString().slice(0, 10);
 
 /**
  * 화면에서 사용하는 테이블 한 행 타입

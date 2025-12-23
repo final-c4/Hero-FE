@@ -36,9 +36,9 @@ export interface PageResponse<T> {
   page: number
   size: number
   totalElements: number
-  totalPages: number
-  first: boolean
-  last: boolean
+  totalPages?: number
+  first?: boolean
+  last?: boolean
 }
 
 /**
@@ -154,10 +154,10 @@ export const useAttendanceDashboardStore = defineStore(
 
           // 백엔드 PageResponse.page 가 0-based 인 경우 → +1
           // 1-based 로 내려오면 아래 한 줄을 `this.currentPage = data.page;` 로 바꿔주세요.
-          this.currentPage = data.page + 1
+          this.currentPage = typeof data.page === 'number' ? data.page + 1 : page
 
-          this.totalCount = data.totalElements
-          this.totalPages = data.totalPages
+          this.totalCount = data.totalElements ?? 0
+          this.totalPages = data.totalPages ?? 0
         } catch (error) {
           console.error('근태 점수 대시보드 조회 실패:', error)
         } finally {
