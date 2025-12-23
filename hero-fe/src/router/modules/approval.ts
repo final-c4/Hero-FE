@@ -1,5 +1,5 @@
 /**
- * (File => TypeScript) Name   : approval.ts
+ * TypeScript Name   : approval.ts
  * Description : 결재(Approval) 도메인 라우트 설정
  *               - 결재 작성 화면
  *               - 결재 서식 목록 화면

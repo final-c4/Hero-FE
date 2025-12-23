@@ -1,6 +1,6 @@
 /**
- * (File => TypeScript) Name   : index.ts
- * Description : 결재(Approval)서식 도메인 컴포넌트 경로 export 
+ * TypeScript Name: index.ts
+ * Description: 결재(Approval)서식 도메인 컴포넌트 경로 export 
  *
  * History
  * 2025/12/10 - 민철 최초 작성
