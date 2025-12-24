@@ -51,7 +51,6 @@
 
         <!-- 필터 -->
         <div class="filter-row">
-          <label>평가 템플릿</label>
           <select v-model="selectedTemplateId" @change="onTemplateChange">
             <option
               v-for="t in dashboardData"

@@ -51,7 +51,6 @@
 
         <!-- 필터 -->
         <div class="filter-row">
-          <label>평가 템플릿</label>
           <select v-model="selectedTemplateId" @change="updateChart">
             <option
               v-for="t in dashboardData"
@@ -122,13 +121,26 @@ const calculateAvgScoreByDepartment = () => {
 
   if (!template) return { labels: [], values: [] };
 
-  const labels: string[] = [];
-  const values: number[] = [];
+  const deptMap: Record<string, { sum: number; count: number }> = {};
 
   template.evaluations.forEach((evaluation: any) => {
-    labels.push(evaluation.evaluationDepartmentName);
-    values.push(Number(evaluation.evaluationTotalScore.toFixed(1)));
+    const score = evaluation.evaluationTotalScore;
+    const dept = evaluation.evaluationDepartmentName;
+
+    if (score == null) return;
+
+    if (!deptMap[dept]) {
+      deptMap[dept] = { sum: 0, count: 0 };
+    }
+
+    deptMap[dept].sum += score;
+    deptMap[dept].count += 1;
   });
+
+  const labels = Object.keys(deptMap);
+  const values = labels.map(dept =>
+    Number((deptMap[dept].sum / deptMap[dept].count).toFixed(1))
+  );
 
   return { labels, values };
 };
