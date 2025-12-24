@@ -1,4 +1,16 @@
- */
+/*
+  <pre>
+  TypeScript Name    : settings-notification.types
+  Description : 알림 시스템 관련 데이터 전송 객체 (DTO) 정의
+  
+  History
+  2025/12/22 (혜원) 최초 작성
+  2025/12/24 (혜원) 직급/직책 선택 로직 개선, 타입 매핑 추가
+  </pre>
+ 
+  @author 혜원
+  @version 1.1
+*/
 
 /**
  * 전체 알림 브로드캐스트 요청 DTO
