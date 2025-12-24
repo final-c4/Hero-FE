@@ -200,7 +200,7 @@ const notificationTypes: NotificationSettingItem[] = [
   {
     id: 'attendanceEnabled',
     label: '근태 알림',
-    description: '출퇴근, 지각, 휴가 등 근태 관련 알림',
+    description: '출퇴근, 지각 등 근태 관련 알림',
     icon: '/images/alarm/alarm-time.svg',
   },
   {
