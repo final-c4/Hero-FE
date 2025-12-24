@@ -706,16 +706,23 @@ const handleElectronicApproval = () => {
 .stat-row {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   font-size: 13px;
+  gap: 8px;
 }
 
 .stat-row .label {
   color: #94a3b8;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .stat-row .val {
   color: #475569;
   font-weight: 500;
+  text-align: right;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 
 .extra-actions {

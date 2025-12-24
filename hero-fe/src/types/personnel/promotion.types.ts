@@ -45,7 +45,7 @@ export interface PromotionCandidateDTO {
     nominatorName?: string,
     nominationReason?: string,
     status?: string,
-    rejectionReason?: string
+    rejectionReason?: string, // 반려 사유 또는 승인 코멘트
     evaluationPoint?: number
 }
 

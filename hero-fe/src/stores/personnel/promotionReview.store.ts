@@ -106,7 +106,9 @@ export const usePromotionReviewStore = defineStore('promotion-review', () => {
                 }
 
                 candidate.status = status;
-                if (reason) candidate.rejectionReason = reason;
+                if (reason) {
+                    candidate.rejectionReason = reason;
+                }
             }
         });
     };
