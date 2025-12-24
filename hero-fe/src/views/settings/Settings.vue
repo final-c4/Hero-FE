@@ -139,8 +139,11 @@ onMounted(() => {
 }
 
 .content-container {
+  padding: 0;
   flex: 1;
-  height: auto;
+  min-height: 0;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 </style>
