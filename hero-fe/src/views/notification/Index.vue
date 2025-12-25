@@ -100,7 +100,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, Ref, ComputedRef } from 'vue';
 import { useRouter } from 'vue-router';
-import { useNotificationStore } from '@/stores/notification/notificationStore';
+import { useNotificationStore } from '@/stores/notification/notification.store';
 import NotificationHeader from '@/components/notification/NotificationHeader.vue';
 import NotificationFilter from '@/components/notification/NotificationFilter.vue';
 import NotificationItem from '@/components/notification/NotificationItem.vue';

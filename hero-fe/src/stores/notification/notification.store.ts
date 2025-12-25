@@ -1,6 +1,6 @@
 /**
  * <pre>
- * TypeScript Name: notificationStore
+ * TypeScript Name: notification.store
  * Description: 알림 전역 상태 관리 (Pinia Store)
  *
  * History
@@ -23,7 +23,7 @@ import type {
   NotificationDTO, 
   NotificationCategory 
 } from '@/types/notification/notification.types';
-import { useNotificationSettingsStore } from './notificationSettingsStore';
+import { useNotificationSettingsStore } from './notificationSettings.store';
 
 export const useNotificationStore = defineStore('notification', () => {
   const authStore = useAuthStore();
