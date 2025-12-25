@@ -69,10 +69,6 @@
                 class="filter-input"
                 :max="today"
               />
-              <span class="date-icon">📅</span>
-            </div>
-          </div>
-
 
               <span class="filter-separator">~</span>
 
@@ -82,14 +78,10 @@
                 class="filter-input"
                 :max="today"
               />
-                            <span class="date-icon">📅</span>
-
-              <span class="filter-separator">~</span>
-
-              <input
-                v-model="endDate"
-                type="date"
-                class="filter-input"
+            </div>
+            <!-- 오른쪽: 검색 / 초기화 버튼 -->
+            <div class="search-button-group">
+              <button class="btn-search" @click="onSearch">검색</button>
               <button class="btn-reset" @click="onReset">초기화</button>
             </div>
           </div>
