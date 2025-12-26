@@ -259,7 +259,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Doughnut } from 'vue-chartjs';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { useNotificationStore } from '@/stores/notification/notificationStore';
+import { useNotificationStore } from '@/stores/notification/notification.store';
 import type { Notification } from '@/types/notification/notification.types';
 
 // Chart.js 등록
@@ -378,7 +378,6 @@ const getNotificationIcon = (type: string): string => {
     'attendance': '/images/alarm/alarm-check.svg',
     'payroll': '/images/alarm/alarm-money.svg',
     'approval': '/images/alarm/alarm-paper.svg',
-    'leave': '/images/alarm/alarm-calendar.svg',
     'evaluation': '/images/alarm/alarm-paper.svg',
     'system': '/images/alarm/alarmsetting.svg'
   };
