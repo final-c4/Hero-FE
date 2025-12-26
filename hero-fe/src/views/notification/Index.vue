@@ -98,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, Ref, ComputedRef } from 'vue';
+import { ref, computed, onMounted, Ref, ComputedRef } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNotificationStore } from '@/stores/notification/notification.store';
 import NotificationHeader from '@/components/notification/NotificationHeader.vue';
@@ -338,14 +338,9 @@ onMounted(async () => {
   try {
     await notificationStore.fetchNotifications();
     updateTabCounts();
-    notificationStore.connectWebSocket();
   } catch (error) {
     console.error('초기화 실패:', error);
   }
-});
-
-onUnmounted(() => {
-  notificationStore.disconnectWebSocket();
 });
 </script>
 
