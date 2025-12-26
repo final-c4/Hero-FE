@@ -51,7 +51,7 @@ export const useNotificationStore = defineStore('notification', () => {
       isLoading.value = true;
       error.value = null;
       
-      const data = await notificationApi.findNotifications(false);
+      const data = await notificationApi.findNotifications();
       notifications.value = data.map(mapDTOToNotification);
         
     } catch (err) {
