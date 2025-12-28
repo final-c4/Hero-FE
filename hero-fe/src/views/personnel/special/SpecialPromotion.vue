@@ -2,14 +2,12 @@
   <div class="special-promotion-page">
     <div class="header-section">
       <h1 class="page-title">특별 승진</h1>
-      <p class="page-description">목록에서 사원을 선택하여 특별 승진을 진행합니다.</p>
     </div>
 
     <div class="content-layout">
       <!-- Left Panel: Employee List -->
       <div class="list-panel">
         <div class="list-header">
-          <h3>승진 대상 사원</h3>
           <div class="search-wrapper">
             <input
               type="text"
@@ -62,10 +60,30 @@
           </table>
         </div>
 
-        <div class="pagination-container">
-          <button @click="goToPage(currentPage - 1)" :disabled="currentPage <= 1 || isLoadingList">이전</button>
-          <span>{{ currentPage }} / {{ totalPages }}</span>
-          <button @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages || isLoadingList">다음</button>
+        <div class="pagination">
+          <button
+            class="page-button"
+            :disabled="currentPage === 1 || isLoadingList"
+            @click="goToPage(currentPage - 1)"
+          >
+            이전
+          </button>
+          <button
+            v-for="page in totalPages"
+            :key="page"
+            class="page-button"
+            :class="{ 'page-active': page === currentPage }"
+            @click="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+          <button
+            class="page-button"
+            :disabled="currentPage >= totalPages || isLoadingList"
+            @click="goToPage(currentPage + 1)"
+          >
+            다음
+          </button>
         </div>
       </div>
 
@@ -356,11 +374,6 @@ const resetForm = () => {
   margin-bottom: 4px;
 }
 
-.page-description {
-  font-size: 14px;
-  color: #64748b;
-}
-
 .content-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -384,14 +397,8 @@ const resetForm = () => {
   padding: 20px;
   border-bottom: 1px solid #e2e8f0;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-}
-
-.list-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #1e293b;
 }
 
 .table-container {
@@ -407,15 +414,15 @@ const resetForm = () => {
 .employee-table th,
 .employee-table td {
   padding: 12px 16px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #f1f5f9;
   font-size: 14px;
 }
 
 .employee-table th {
-  background-color: #f8fafc;
-  font-weight: 500;
-  color: #64748b;
+  background: linear-gradient(180deg, #1c398e 0%, #162456 100%);
+  font-weight: 600;
+  color: white;
 }
 
 .employee-table tbody tr {
@@ -459,27 +466,35 @@ const resetForm = () => {
   to { transform: rotate(360deg); }
 }
 
-.pagination-container {
-  padding: 12px;
-  border-top: 1px solid #e2e8f0;
+.pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  font-size: 14px;
+  padding: 16px;
+  gap: 10px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
 }
 
-.pagination-container button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background-color: white;
+.page-button {
+  padding: 5px 12px;
+  border: 1px solid #cad5e2;
+  background: white;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #62748e;
   cursor: pointer;
 }
 
-.pagination-container button:disabled {
-  opacity: 0.5;
+.page-button:disabled {
   cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.page-button.page-active {
+  background: #155dfc;
+  border-color: #155dfc;
+  color: white;
 }
 
 .form-panel .placeholder {
@@ -594,14 +609,14 @@ const resetForm = () => {
 }
 
 .btn-search {
-  background-color: #4b5563;
+  background: linear-gradient(180deg, #1c398e 0%, #162456 100%);
   color: white;
   padding: 0 16px;
   flex-shrink: 0;
 }
 
 .btn-search:hover {
-  background-color: #374151;
+  opacity: 0.9;
 }
 
 .btn-search:disabled {
