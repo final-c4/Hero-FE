@@ -49,10 +49,7 @@
         <!-- 새 비밀번호 -->
         <div class="form-group">
           <label class="label-with-icon required">
-            <svg class="label-icon" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8L14 8" stroke="#432DD7" stroke-width="1.33"/>
-              <path d="M6 4L6 8M10 4L10 6" stroke="#432DD7" stroke-width="1.33"/>
-            </svg>
+          <img src="/images/password.svg" alt="비밀번호" class="label-icon" />
             새 비밀번호
           </label>
           <div class="input-wrapper">
@@ -134,10 +131,7 @@
         <!-- 새 비밀번호 확인 -->
         <div class="form-group">
           <label class="label-with-icon required">
-            <svg class="label-icon" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8L14 8" stroke="#432DD7" stroke-width="1.33"/>
-              <path d="M6 4L6 8M10 4L10 6" stroke="#432DD7" stroke-width="1.33"/>
-            </svg>
+          <img src="/images/password.svg" alt="비밀번호" class="label-icon" />
             새 비밀번호 확인
           </label>
           <div class="input-wrapper">
