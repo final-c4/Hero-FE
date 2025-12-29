@@ -12,7 +12,7 @@ import { useAuthStore } from './stores/auth';
 async function initializeApp() {
     const app = createApp(App);
     const pinia = createPinia();
-    
+
     app.use(pinia);
 
     // =================== Vue Query 설정 ===================
