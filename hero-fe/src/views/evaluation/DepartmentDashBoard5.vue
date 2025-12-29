@@ -206,7 +206,7 @@ const loadPromotionCandidates = async () => {
 onMounted(loadPromotionCandidates);
 </script>
 
-
+<!--style-->
 <style scoped>
 /* Page & Layout */
 .page {
