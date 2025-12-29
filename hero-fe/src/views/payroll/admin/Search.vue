@@ -107,17 +107,33 @@
         </tbody>
       </table>
       <div class="pager">
-        <button class="btn-lite" :disabled="loading || page <= 1" @click="goPage(page - 1)">
+        <button
+          class="pbtn"
+          type="button"
+          :disabled="loading || page <= 1"
+          @click="goPage(page - 1)"
+        >
           이전
         </button>
 
-        <div class="pager-center">
-          <span class="pager-num">{{ page }}</span>
-          <span class="pager-split">/</span>
-          <span class="pager-num">{{ totalPages || 1 }}</span>
-        </div>
+        <button
+          v-for="p in pageNumbers"
+          :key="p"
+          class="pnum"
+          type="button"
+          :class="{ active: p === page }"
+          :disabled="loading"
+          @click="goPage(p)"
+        >
+          {{ p }}
+        </button>
 
-        <button class="btn-lite" :disabled="loading || page >= totalPages" @click="goPage(page + 1)">
+        <button
+          class="pbtn"
+          type="button"
+          :disabled="loading || page >= (totalPages || 1)"
+          @click="goPage(page + 1)"
+        >
           다음
         </button>
       </div>
@@ -232,6 +248,14 @@ const filteredRows = computed(() => {
   const kw = departmentKeyword.value.trim().toLowerCase();
   if (!kw) return rows.value;
   return rows.value.filter((r) => (r.departmentName ?? '').toLowerCase().includes(kw));
+});
+
+// pagination numbers (1..totalPages)
+const pageNumbers = computed(() => {
+  const tp = totalPages.value || 1;
+  const pages: number[] = [];
+  for (let i = 1; i <= tp; i++) pages.push(i);
+  return pages;
 });
 
 const displayTotal = computed(() => {
@@ -365,15 +389,6 @@ async function onSearch() {
   text-decoration: underline;
 }
 
-.btn-lite {
-  border-radius: 999px;
-  font-size: 13px;
-  padding: 6px 14px;
-  border: 1px solid #d1d5db;
-  background: #fff;
-  cursor: pointer;
-}
-
 .btn-lite:disabled,
 .btn-primary:disabled,
 .btn-secondary:disabled {
@@ -427,25 +442,38 @@ async function onSearch() {
   padding: 22px 0;
   color: #6b7280;
 }
+
 .pager {
-  margin-top: 14px;
+  padding: 12px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.pager-center {
-  display: flex;
-  align-items: center;
   gap: 6px;
-  font-size: 13px;
-  color: #374151;
 }
 
-.pager-num {
-  min-width: 18px;
-  text-align: center;
+.pbtn,
+.pnum {
+  height: 30px;
+  min-width: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pnum.active {
+  background: #2855ff;
+  color: #fff;
+  border-color: #2855ff;
+}
+
+.pbtn:disabled,
+.pnum:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .modal-backdrop {
