@@ -1,22 +1,27 @@
 /**
  * <pre>
- * TypeScript Name: inbox_store.ts
+ * TypeScript Name: inbox.store.ts
  * Description: 결재 문서함 스토어
  *
  * 주요 composable 객체:
- * - useInboxStore: 문서함 문서 목록 조회 및 탭 관리
+ * - useInboxStore: 문서함 문서 목록 조회 및 탭 관리, 검색 기능
  * 
  * History
  * 2025/12/26 (민철) 최초 작성
+ * 2025/12/29 (민철) 전체 검색 기능 개선
  * </pre>
  *
  * @author 민철
- * @version 1.0
+ * @version 2.0
  */
 
 import { defineStore } from 'pinia';
 import { getInboxDocuments } from '@/api/approval/inbox.api';
-import type { DocumentsResponseDTO, InboxTab, InboxSearchParams } from '@/types/approval/inbox.types';
+import type { 
+  DocumentsResponseDTO, 
+  InboxTab, 
+  InboxSearchParams
+} from '@/types/approval/inbox.types';
 
 export const useInboxStore = defineStore('inbox', {
   state: () => ({
@@ -36,7 +41,7 @@ export const useInboxStore = defineStore('inbox', {
     searchParams: {
       fromDate: '',
       toDate: '',
-      sortBy: '',
+      sortBy: 'all',
       condition: '',
     } as Omit<InboxSearchParams, 'page' | 'size' | 'tab'>,
     
@@ -46,7 +51,7 @@ export const useInboxStore = defineStore('inbox', {
 
   actions: {
     /**
-     * 문서 목록 조회
+     * 문서 목록 조회 (기본 최신순 정렬)
      */
     async fetchDocuments() {
       this.loading = true;
@@ -115,7 +120,7 @@ export const useInboxStore = defineStore('inbox', {
       this.searchParams = {
         fromDate: '',
         toDate: '',
-        sortBy: '',
+        sortBy: 'all',
         condition: '',
       };
     },

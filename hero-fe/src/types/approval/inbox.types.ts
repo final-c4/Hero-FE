@@ -12,10 +12,11 @@
  * History
  * 2025/12/17 (민철) 최초 작성
  * 2025/12/26 (민철) InboxTab 및 InboxSearchParams 타입 추가
+ * 2025/12/29 (민철) 검색 파라미터 구조 개선
  * </pre>
  *
  * @author 민철
- * @version 2.0
+ * @version 3.0
  */
 
 /**
@@ -37,7 +38,6 @@ export type InboxTab = 'all' | 'que' | 'request' | 'reject' | 'ref' | 'end' | 'd
  * @property {string} drafterDept:  부서(기안자부서)
  * @property {string} drafter:      상신자(=기안자)
  * @property {string} drafterAt:    상신일시
- * 
  */
 export interface DocumentsResponseDTO {
   docId: number;
@@ -57,10 +57,10 @@ export interface DocumentsResponseDTO {
  * @property {number} page:         페이지 번호 (1부터 시작)
  * @property {number} size:         페이지 크기
  * @property {InboxTab} tab:        탭 구분 (all, que, request, reject, ref, end, draft)
- * @property {string} fromDate:     조회 시작일
- * @property {string} toDate:       조회 종료일
- * @property {string} sortBy:       정렬 기준
- * @property {string} condition:    검색 조건
+ * @property {string} fromDate:     조회 시작일 (YYYY-MM-DD)
+ * @property {string} toDate:       조회 종료일 (YYYY-MM-DD)
+ * @property {string} sortBy:       검색 필드 (all, docNo, docType, name, title, dept, drafter)
+ * @property {string} condition:    검색 키워드
  */
 export interface InboxSearchParams {
   page?: number;
@@ -70,4 +70,4 @@ export interface InboxSearchParams {
   toDate?: string;
   sortBy?: string;
   condition?: string;
-}
+};

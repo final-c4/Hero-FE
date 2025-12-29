@@ -9,10 +9,12 @@
  * - 결재 권한이 있는 경우 승인/반려 버튼 표시 (순차 결재)
  *
  * History
- *   2025/12/26 - 민철 최초 작성
- *   2025/12/26 - 민철 결재 처리 기능 추가
- *   2025/12/26 - 민철 순차 결재 로직 적용
- *   2025/12/26 - 민철 디버깅 정보 추가
+ *   2025/12/26 (민철) 최초 작성
+ *   2025/12/26 (민철) 결재 처리 기능 추가
+ *   2025/12/26 (민철) 순차 결재 로직 적용
+ *   2025/12/26 (민철) 디버깅 정보 추가
+ *   2025/12/29 (민철) 디버깅 정보 삭제, 승인/반려 상태 뱃지 반지름 10px로 변경
+ *
  * </pre>
  *
  * @module approval
@@ -36,24 +38,10 @@
                         {{ getStatusText(document.docStatus) }}
                     </div>
 
-                    <!-- 🔍 디버깅 정보 표시 -->
-                    <!-- <div class="debug-info"
-                        style="padding: 8px; background: #f0f0f0; border-radius: 4px; font-size: 11px;">
-                        <div>canApprove: {{ canApprove }}</div>
-                        <div>currentUser: {{ authStore.user?.employeeId }}</div>
-                        <div>docStatus: {{ document.docStatus }}</div>
-                        <div>myLineId: {{ myLineId }}</div>
-                        <div v-if="myLine">
-                            myLine.status: {{ myLine.status }},
-                            myLine.seq: {{ myLine.seq }}
-                        </div>
-                        <div v-if="debugInfo">{{ debugInfo }}</div>
-                    </div> -->
-
                     <!-- 결재 권한이 있는 경우 승인/반려 버튼 표시 (순차 결재) -->
                     <template v-if="canApprove">
                         <button class="btn-reject" @click="openRejectModal">
-                            <img class="btn-icon" src="/images/cancel.svg" alt="반려" />
+                            <img class="btn-icon" src="/images/cancel-white.svg" alt="반려" />
                             <span class="btn-text-white">반려</span>
                         </button>
                         <button class="btn-approve" @click="handleApprove">
@@ -500,7 +488,7 @@ const backToInbox = () => {
 
 .status-badge {
     padding: 6px 16px;
-    border-radius: 20px;
+    border-radius: 10px;
     font-family: "Inter-Regular", sans-serif;
     font-size: 13px;
     font-weight: 500;

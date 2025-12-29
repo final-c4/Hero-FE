@@ -7,14 +7,15 @@
  * - useInbox: 문서함 관련 상태 및 액션 제공
  *
  * History
- *   2025/12/26 - 민철 최초 작성
+ *   2025/12/26 (민철) 최초 작성
+ *   2025/12/29 (민철) 검색 기능 개선
  * </pre>
  *
  * @author 민철
- * @version 1.0
+ * @version 2.0
  */
 
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useInboxStore } from '@/stores/approval/inbox.store';
 import type { InboxTab } from '@/types/approval/inbox.types';

@@ -1,17 +1,18 @@
 /**
  * <pre>
- * API Name        : inbox_api.ts
+ * API Name        : inbox.api.ts
  * Description     : 결재 문서함 조회 API 함수
  *
  * 주요 함수
- *   - getInboxDocuments: 문서함 문서 목록 조회 (탭별 필터링 지원)
+ *   - getInboxDocuments: 문서함 문서 목록 조회 (탭별 필터링, 검색 지원)
  *
  * History
- *   2025/12/26 - 민철 최초 작성
+ *   2025/12/26 (민철) 최초 작성
+ *   2025/12/29 (민철) 전체 검색 기능 개선
  * </pre>
  *
  * @author 민철
- * @version 1.0
+ * @version 2.0
  */
 
 import apiClient from '@/api/apiClient';
