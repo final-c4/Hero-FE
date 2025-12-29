@@ -51,7 +51,6 @@
 
         <!-- 필터 영역 -->
         <div class="filter-row">
-          <label>평가 템플릿</label>
           <select v-model="selectedTemplateId" @change="updateChart">
             <option
               v-for="t in dashboardData"

@@ -53,7 +53,6 @@
       <div class="list-box">
 
         <div class="filter-row">
-          <label>평가 템플릿</label>
           <select v-model="selectedTemplateId" @change="renderDepartmentChart">
             <option
               v-for="t in dashboardData"
@@ -192,7 +191,7 @@ const calculateGradeStats = (data: any[]) => {
     labels.push(grade);
     avgs.push(Number(avg.toFixed(1)));
     stds.push(Number(Math.sqrt(variance).toFixed(1)));
-    counts.push(scores.length); // ✅ 사원 수
+    counts.push(scores.length); 
   });
 
   return { labels, avgs, stds, counts };
