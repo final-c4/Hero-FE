@@ -53,7 +53,6 @@
       <div class="list-box">
 
         <div class="filter-row">
-          <label>평가 템플릿</label>
           <select v-model="selectedTemplateId" @change="renderDepartmentChart">
             <option
               v-for="t in dashboardData"
@@ -228,9 +227,10 @@ const renderDepartmentChart = () => {
           type: "bar",
           label: "부서 평균 점수",
           data: deptAvgs,
-          backgroundColor: "rgba(28, 57, 142, 0.75)",
+          backgroundColor: "#1c398e",
+          borderRadius: 6,
           yAxisID: "yScore",
-          order: 1,
+          order: 3,
           categoryPercentage: 0.6,
           barPercentage: 0.6,
         },
@@ -261,7 +261,7 @@ const renderDepartmentChart = () => {
           pointBorderWidth: 2,
           tension: 0.3,
           yAxisID: "yRatio",
-          order: 3,
+          order: 1,
         },
       ],
     },
