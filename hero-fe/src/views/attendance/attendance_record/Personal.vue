@@ -82,7 +82,7 @@
             class="tab"
             :class="{ 'tab-active': isActiveTab('AttendanceCorrection') }"
           >
-            근태 기록 수정 이력
+            지연 출근 수정 이력
           </RouterLink>
 
           <RouterLink
@@ -90,7 +90,7 @@
             class="tab tab-right"
             :class="{ 'tab-active': isActiveTab('AttendanceChangeLog') }"
           >
-            근무제 변경 이력
+            근무 유형 변경 이력
           </RouterLink>
         </div>
 
@@ -176,10 +176,25 @@
 
                     <td>{{ row.workSystemName }}</td>
 
-                    <td>
-                      <button class="link-button">
-                        근태 정정 / 초과 근무 신청
-                      </button>
+                    <td class="action-cell">
+                      <div class="action-button-group">
+                        <button
+                          type="button"
+                          class="link-button"
+                          @click="goToLateRequest(row)"
+                        >
+                          지연 출근 신청
+                        </button>
+
+                        <span class="action-divider">/</span>
+
+                        <button
+                          type="button"
+                          class="link-button"
+                        >
+                          초과 근무 신청
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -223,12 +238,13 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import { useAttendanceStore } from '@/stores/attendance/attendanceStore';
 
 const attendanceStore = useAttendanceStore();
 const route = useRoute();
+const router = useRouter();
 
 const today = new Date().toISOString().slice(0, 10);
 
@@ -269,11 +285,6 @@ const onReset = (): void => {
   attendanceStore.fetchPersonal(1);
 };
 
-/**
- * 근무시간(분 단위)을 "시간" 단위로 변환
- * - 480 -> "8시간"
- * - 150 -> "2.5시간"
- */
 const formatWorkDuration = (minutes?: number | null): string => {
   if (minutes == null) return '';
 
@@ -288,6 +299,21 @@ onMounted(() => {
   attendanceStore.fetchPersonal(1);
   attendanceStore.fetchPersonalSummary();
 });
+
+type PersonalRow = {
+  attendanceId: number;
+};
+
+const goToLateRequest = (row: PersonalRow): void => {
+  router.push({
+    name: 'ApprovalCreate',
+    params: { formName: 'modifyworkrecord' },
+    query: {
+      templateId: '5',
+      attendanceId: String(row.attendanceId),
+    },
+  });
+};
 </script>
 
 <style scoped>
@@ -555,6 +581,16 @@ onMounted(() => {
   color: #0069ff;
   cursor: pointer;
   text-align: left;
+}
+
+.action-button-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.action-divider {
+  color: #94a3b8;
 }
 
 /* 페이지네이션 */
