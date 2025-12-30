@@ -8,6 +8,8 @@
   History
   2025/12/10 - 이지윤 최초 작성
   2025/12/29 - 행 간격/테이블 정렬 및 근무시간 표시 형식 개선
+  2025/12/30 - 이지윤 지연 근무 로직 추가 및 디자인 수정
+  2025/12/30 - 이지윤 초과 근무 로직 추가
 -->
 
 <template>
@@ -191,6 +193,7 @@
                         <button
                           type="button"
                           class="link-button"
+                          @click="goToOvertimeRequest(row)"
                         >
                           초과 근무 신청
                         </button>
@@ -302,6 +305,7 @@ onMounted(() => {
 
 type PersonalRow = {
   attendanceId: number;
+  workDate: string;
 };
 
 const goToLateRequest = (row: PersonalRow): void => {
@@ -311,6 +315,18 @@ const goToLateRequest = (row: PersonalRow): void => {
     query: {
       templateId: '5',
       attendanceId: String(row.attendanceId),
+    },
+  });
+};
+
+
+const goToOvertimeRequest = (row: PersonalRow): void => {
+  router.push({
+    name: 'ApprovalCreate',
+    params: { formName: 'overtime' },
+    query: {
+      templateId: '7',
+      workDate: row.workDate,
     },
   });
 };

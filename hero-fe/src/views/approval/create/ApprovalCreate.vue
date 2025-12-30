@@ -14,6 +14,7 @@
  *   2025/12/25 - 민철 서식 목록에서 서식ID 쿼리스트링으로 전달받기
  *   2025/12/26 - 민철 Composable 사용 및 타입 안정성 개선, 미리보기 주석처리
  *   2025/12/30 - 지윤 지연 출근 수정 로직 관련 함수(preloadModifyWorkRecord) 추가
+ *   2025/12/30 - 지윤 초과 출근 수정 로직 관련 함수(preloadOvertime) 추가
  * </pre>
  *
  * @module approval
@@ -134,9 +135,8 @@ onMounted(async () => {
   }
   
   await preloadModifyWorkRecord();
+  await preloadOvertime(); 
 });
-
-
 
 const commonFormRef = ref<InstanceType<typeof ApprovalCreateCommonForm>>();
 const sectionData = ref<any>({});
@@ -168,6 +168,24 @@ const preloadModifyWorkRecord = async (): Promise<void> => {
   } catch (e) {
     console.error('❌ 근태 단건 조회 실패:', e);
   }
+};
+
+// 초과 근무 신청 로직에 사용되는 함수
+// Personal.vue에서 attendanceId를 받아 초과근무 폼 기본값을 세팅하기 위해 사용
+const preloadOvertime = async (): Promise<void> => {
+  if (props.formName !== 'overtime') return;
+
+  const workDate = String(route.query.workDate ?? '');
+  if (!workDate) return;
+
+  if (sectionData.value?.workDate === workDate) return;
+
+    sectionData.value = {
+    workDate,
+    startTime: '00:00',
+    endTime: '00:00',
+    reason: '',
+  };
 };
 
 // 섹션 컴포넌트 매핑

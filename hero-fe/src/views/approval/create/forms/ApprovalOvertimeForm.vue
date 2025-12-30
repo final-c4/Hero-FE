@@ -10,6 +10,7 @@
   *   2025/12/10 - 민철 최초 작성
   *   2025/12/14 - 민철 공통 컴포넌트화
   *   2025/12/23 - 민철 파일명 변경
+  *   2025/12/30 - 지윤 초과 근무 로직을 위한 함수(watch) 추가 및 수정
   * </pre>
   *
   * @module approval
@@ -219,9 +220,32 @@ watch(
     formData.startTime = newStartTime;
     formData.endTime = newEndTime;
     formData.reason = newReason;
-    emit('update:modelValue', { ...formData });
+    emit('update:modelValue', {
+      ...(props.modelValue ?? {}),
+      ...formData,
+    } as any);
   }
 );
+
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (!newVal) return;
+
+    workDate.value = newVal.workDate ?? '';
+    reason.value = newVal.reason ?? '';
+
+    const s = parseTime(newVal.startTime ?? '00:00');
+    startTime.hour = s.hour;
+    startTime.minute = s.minute;
+
+    const e = parseTime(newVal.endTime ?? '00:00');
+    endTime.hour = e.hour;
+    endTime.minute = e.minute;
+  },
+  { immediate: true, deep: true }
+);
+
 </script>
 
 <style scoped>
