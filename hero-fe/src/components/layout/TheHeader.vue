@@ -4,13 +4,13 @@
   Description : 공통 헤더 컴포넌트 - 로고, 알림, 세션 타이머, 사용자 프로필 표시
 
   History
-  2025/11/28 - 승건 최초 작성
-  2025/12/02 - 동근 헤더 레이아웃 및 스타일링 수정 & js->ts 변환
-  2025/12/08 - 승민 헤더 레이아웃 디자인 최종 수정
-  2025/12/10 - 혜원 알림 페이지 라우팅 기능 추가
-  2025/12/11 - 승건 프로필 드롭다운 및 로그아웃 기능 추가
-  2025/12/11 - 동근 로고 클릭 시 대시보드 이동 기능 추가, 로그인 세션 남은 시간 표시 & JSDoc 추가
-  2025/12/16 - 동근 logo-area 스타일 수정(border 제거)
+  2025/11/28 (승건) 최초 작성
+  2025/12/02 (동근) 헤더 레이아웃 및 스타일링 수정 & js->ts 변환
+  2025/12/08 (승민) 헤더 레이아웃 디자인 최종 수정
+  2025/12/10 (혜원) 알림 페이지 라우팅 기능 추가
+  2025/12/11 (승건) 프로필 드롭다운 및 로그아웃 기능 추가
+  2025/12/11 (동근) 로고 클릭 시 대시보드 이동 기능 추가, 로그인 세션 남은 시간 표시 & JSDoc 추가
+  2025/12/16 (동근) logo-area 스타일 수정(border 제거)
   </pre>
  
   @author 동근
@@ -56,7 +56,10 @@
         <!-- 사용자 프로필 정보 -->
         <div v-if="user" class="profile-container">
           <div class="profile-box" @click="toggleDropdown">
-            <div class="profile-icon">{{ user.employeeName?.charAt(0) }}</div>
+            <div class="profile-icon">
+              <img v-if="user.imagePath && !imageLoadError" :src="profileImageUrl" class="profile-img" alt="Profile" @error="handleImageError" />
+              <span v-else>{{ user.employeeName?.charAt(0) }}</span>
+            </div>
             <div class="profile-info">
               <div class="profile-name">{{ user.employeeName }} {{ user.gradeName }}</div>
               <div class="profile-team">{{ user.departmentName }}</div>
@@ -78,7 +81,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { storeToRefs } from 'pinia';
 //세션 관리
@@ -94,7 +97,33 @@ const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 
 const isDropdownOpen = ref(false);
+const imageLoadError = ref(false);
 
+const handleImageError = () => {
+  imageLoadError.value = true;
+};
+
+// 사용자 정보(이미지 경로)가 변경되면 에러 상태 초기화
+watch(() => user.value?.imagePath, () => {
+  imageLoadError.value = false;
+});
+
+// 프로필 이미지 URL 계산
+const profileImageUrl = computed(() => {
+  const path = user.value?.imagePath;
+  if (!path) return '';
+
+  // http로 시작하는 외부 링크는 그대로 사용
+  if (path.startsWith('http')) return path;
+
+  // 상대 경로인 경우 백엔드 주소와 /uploads 프리픽스 조합
+  const baseUrl = 'http://localhost:8080';
+  let resourcePath = path.startsWith('/') ? path : `/${path}`;
+  if (!resourcePath.startsWith('/uploads')) {
+    resourcePath = `/uploads${resourcePath}`;
+  }
+  return `${baseUrl}${resourcePath}`;
+});
 
 // 메인 로고 버튼 클릭 시 대시보드 이동
 const goDashboard = () => {
@@ -119,11 +148,13 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 };
 
+/**
+ * 마이페이지로 이동
+ * 현재 로그인한 사용자의 프로필 페이지로 라우팅
+ */
 const goToMyPage = () => {
-  // TODO: 마이페이지 라우트가 정의되면 활성화
-  // router.push('/my-page');
-  console.log('마이페이지로 이동');
-  isDropdownOpen.value = false; // 클릭 후 드롭다운 닫기
+  router.push('/mypage'); 
+  isDropdownOpen.value = false;
 };
 
 const handleLogout = async () => {
@@ -335,6 +366,13 @@ const handleLogout = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 11.25px;
 }
 
 .profile-info {

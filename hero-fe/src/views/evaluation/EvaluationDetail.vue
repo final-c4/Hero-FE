@@ -52,6 +52,13 @@
           </div>
 
           <div class="info-card">
+            <div class="info-label">평가 종료일</div>
+            <div class="info-value">
+              {{ formattedEndedAt }}
+            </div>
+          </div>
+
+          <div class="info-card">
             <div class="info-label">평가 가이드</div>
             <div class="info-value">
               {{ evaluation.evaluationEvaluationGuideName ?? "-" }}
@@ -302,6 +309,14 @@ const deleteEvaluation = async () => {
   alert("평가가 삭제되었습니다.");
   router.back();
 };
+
+/**
+ * 설명: 평가 종료일 포맷
+ */
+const formattedEndedAt = computed(() => {
+  if (!evaluation.value?.evaluationEndedAt) return "-";
+  return evaluation.value.evaluationEndedAt.slice(0, 10);
+});
 
 /**
  * 설명: 마운트 시, 평가 조회
