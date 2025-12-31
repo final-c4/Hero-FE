@@ -23,6 +23,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+
+    - name: Get current time
+      uses: 1466587594/get-current-time@v2
+      id: current-time # 이 ID가 아래 version_label의 steps.current-time과 연결됩니다.
+      with:
+        format: YYYY-MM-DDTHH-mm-ss
+        utcOffset: "+09:00"
+
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
