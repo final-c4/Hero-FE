@@ -7,10 +7,7 @@ permissions:
 on:
   push:
     branches:
-       - "deploy/aws-eb"
-  # push:
-  #   branches:
-  #     - "main"
+      - "main"
 
 jobs:
   deploy:
