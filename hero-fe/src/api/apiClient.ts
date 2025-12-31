@@ -17,7 +17,7 @@ import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'ax
 import { useAuthStore } from '@/stores/auth';
 
 // 1. 기본 API 설정
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: BASE_URL,
