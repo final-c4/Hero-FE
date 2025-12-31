@@ -8,11 +8,8 @@
   History
   2025/12/10 - 이지윤 최초 작성
   2025/12/29 - 행 간격/테이블 정렬 및 근무시간 표시 형식 개선
-<<<<<<< HEAD
   2025/12/30 - 이지윤 지연 근무 로직 추가 및 디자인 수정
   2025/12/30 - 이지윤 초과 근무 로직 추가
-=======
->>>>>>> develop
 -->
 
 <template>
@@ -309,9 +306,18 @@ onMounted(() => {
 type PersonalRow = {
   attendanceId: number;
   workDate: string;
+  startTime?: string | null;
+  endTime?: string | null;
 };
 
-const goToLateRequest = (row: PersonalRow): void => {
+const goToLateRequest = (row: any): void => {
+  attendanceStore.setSelectdRow({
+    attendanceId: row.attendanceId,
+    workDate: row.workDate,
+    startTime: row.startTime,
+    endTime: row.endTime,
+  });
+
   router.push({
     name: 'ApprovalCreate',
     params: { formName: 'modifyworkrecord' },
@@ -323,7 +329,14 @@ const goToLateRequest = (row: PersonalRow): void => {
 };
 
 
-const goToOvertimeRequest = (row: PersonalRow): void => {
+const goToOvertimeRequest = (row: any): void => {
+  attendanceStore.setSelectdRow({
+    attendanceId: row.attendanceId,
+    workDate: row.workDate,
+    startTime: row.startTime,
+    endTime: row.endTime,
+  });
+
   router.push({
     name: 'ApprovalCreate',
     params: { formName: 'overtime' },
