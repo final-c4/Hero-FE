@@ -10,6 +10,7 @@
   *   2025/12/10 - 민철 최초 작성
   *   2025/12/14 - 민철 공통 컴포넌트화
   *   2025/12/23 - 민철 파일명 변경
+  *   2025/12/30 - 지윤 지연 출근 수정 로직을 구현하기 위해서 watch 부분 수정 및 추가
   * </pre>
   *
   * @module approval
@@ -219,9 +220,34 @@ watch(
     formData.correctedStart = newStartTime;
     formData.correctedEnd = newEndTime;
     formData.reason = newReason;
-    emit('update:modelValue', { ...formData });
+    emit('update:modelValue', {
+      ...(props.modelValue ?? {}),
+      ...formData,
+    } as any);
   }
 );
+
+// 부모한테서 내려온 값 실시간 반영
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (!newVal) return;
+
+    // ✅ 외부에서 넘어온 값으로 폼을 재세팅
+    workDate.value = newVal.targetDate ?? '';
+    reason.value = newVal.reason ?? '';
+
+    const s = parseTime(newVal.correctedStart ?? '00:00');
+    startTime.hour = s.hour;
+    startTime.minute = s.minute;
+
+    const e = parseTime(newVal.correctedEnd ?? '00:00');
+    endTime.hour = e.hour;
+    endTime.minute = e.minute;
+  },
+  { immediate: true, deep: true }
+);
+
 </script>
 
 <style scoped>
