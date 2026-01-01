@@ -154,7 +154,7 @@ export const usePayrollAdjustmentStore = defineStore('payrollAdjustmentAdmin', (
                         const cur = Number(parsed.currentAmount ?? 0);
                         const adj = Number(parsed.adjustmentAmount ?? 0);
 
-                        r.amount = adj; // ✅ 조정 후 금액 표시
+                        r.amount = adj;
                         r.sign = adj >= cur ? '+' : '-';
 
                         const reason = (parsed.reason ?? '').trim();
