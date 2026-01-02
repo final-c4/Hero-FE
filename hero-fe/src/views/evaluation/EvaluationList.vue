@@ -78,25 +78,10 @@
         </div>
 
         <!-- 페이지네이션 -->
-        <div class="paging">
-            <div class="page-btn" @click="goPage(currentPage - 1)">
-                이전
-            </div>
-
-            <div
-                class="page-btn"
-                v-for="page in pageNumbers"
-                :key="page"
-                :class="{ active: page === currentPage }"
-                @click="goPage(page)"
-            >
-                {{ page + 1 }}
-            </div>
-
-            <div class="page-btn" @click="goPage(currentPage + 1)">
-                다음
-            </div>
-        </div>
+        <SlidingPagination
+          v-model="currentPage"
+          :total-pages="totalPages"
+        />
 
       </div>
     </div>
@@ -107,9 +92,10 @@
 <script setup lang="ts">
 //Import 구문
 import apiClient from '@/api/apiClient';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import SlidingPagination from '@/components/common/SlidingPagination.vue';
 
 //외부 로직
 const router = useRouter();
@@ -258,6 +244,10 @@ const goEvaluationList = () => {
 const goToCreate = (templateId: number) => {
   router.push(`/evaluation/create/${templateId}`);
 };
+
+watch(currentPage, () => {
+  selectEvaluationTemplateList();
+});
 
 /**
  * 설명: 마운트 시, 평가 템플릿 목록 조회하는 메소드
