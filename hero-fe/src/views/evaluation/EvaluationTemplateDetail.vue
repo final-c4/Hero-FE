@@ -90,7 +90,7 @@
             :key="index"
           >
             <header class="section-header">
-              <div class="number-badge">{{ index + 1 }}</div>
+              <div class="number-badge">{{ Number(index) + 1 }}</div>
             </header>
 
             <section class="field-group">

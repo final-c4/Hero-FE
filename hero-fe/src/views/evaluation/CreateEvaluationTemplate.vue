@@ -184,6 +184,8 @@ import { useAuthStore } from '@/stores/auth';
 const router = useRouter();
 const authStore = useAuthStore();
 
+console.log(authStore.user)
+
 // Reactive 데이터
 const templateName = ref("");
 const creator = ref(""); 
@@ -210,7 +212,7 @@ authGradeId.value = authStore.user?.gradeId
 authGradeName.value = authStore.user?.gradeName
 
 onMounted(() => {
-  if(authDepartmentId.value != 2){
+  if(authStore.hasAnyRole(['ROLE_SYSTEM_ADMIN','ROLE_HR_MANAGER','ROLE_HR_EVALUATION'])){
     alert("인사팀이 아닙니다.");
     goBack();
   }

@@ -96,25 +96,10 @@
         </div>
 
         <!-- ================= Pagination ================= -->
-        <div class="paging">
-            <div class="page-btn" @click="goPage(currentPage - 1)">
-                이전
-            </div>
-
-            <div
-                class="page-btn"
-                v-for="page in pageNumbers"
-                :key="page"
-                :class="{ active: page === currentPage }"
-                @click="goPage(page)"
-            >
-                {{ page + 1 }}
-            </div>
-
-            <div class="page-btn" @click="goPage(currentPage + 1)">
-                다음
-            </div>
-        </div>
+        <SlidingPagination
+          v-model="currentPage"
+          :total-pages="totalPages"
+        />
 
       </div>
     </div>
@@ -129,11 +114,12 @@
 
 <script setup lang="ts">
 //Import 구문
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import apiClient from "@/api/apiClient";
 import EvaluationProgressModal from "@/views/evaluation/EvaluationProgressModal.vue";
 import { useAuthStore } from '@/stores/auth';
+import SlidingPagination from '@/components/common/SlidingPagination.vue';
 
 //외부 로직
 const router = useRouter();
@@ -328,6 +314,10 @@ const deleteEvaluation = async (evaluationId: number) => {
     alert("평가 삭제 중 오류가 발생했습니다.");
   }
 };
+
+watch(currentPage, () => {
+  fetchEvaluations();
+});
 
 /**
  * 설명: 마운트 시, 평가 목록 조회 메소드

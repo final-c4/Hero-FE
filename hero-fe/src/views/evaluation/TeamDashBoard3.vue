@@ -260,9 +260,6 @@ const analyzeEvaluatee = async () => {
 
   const res = await apiClient.post("/ai/analysis/member", payload);
 
-  console.log("RAW RESPONSE:", res);
-  console.log("REAL DATA:", res.data);
-
   const realData = res.data;
 
   strengths.value = realData.strengths ?? [];
