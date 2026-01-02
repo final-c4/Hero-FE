@@ -317,7 +317,7 @@ const saveEvaluation = async () => {
  * 설명: 마운트 시, 평가 테플릿과 가이드 조회
  */
 onMounted(async () => {
-  if(authGradeId.value != 6){
+  if(!authStore.hasAnyRole(['ROLE_SYSTEM_ADMIN','ROLE_DEPT_MANAGER'])){
     alert("직급이 부장이 아니시라서 평가를 생성할 수 없습니다.")
     goBack();
   }

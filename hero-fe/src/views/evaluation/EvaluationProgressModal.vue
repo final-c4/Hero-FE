@@ -114,7 +114,8 @@
 
             <!-- 평가 완료 -->
             <button
-              v-else-if="emp.evaluateeStatus === 2 && (authEmployeeId === emp.evaluateeEmployeeId || authEmployeeId === evaluationDetail?.evaluationEmployeeId)"
+              v-else-if="emp.evaluateeStatus === 2 && 
+              (authEmployeeId === emp.evaluateeEmployeeId || authEmployeeId === evaluationDetail?.evaluationEmployeeId || authStore.hasAnyRole(['ROLE_HR_MANAGER','ROLE_HR_EVALUATION']))"
               class="btn-action primary"
               @click="goView(emp)"
             >
