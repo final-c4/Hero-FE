@@ -9,10 +9,10 @@
 
 <!--template-->
 <template>
-  <div class="container">
+  <div class="container" :class="{ 'modal-container': isModal }">
 
     <!-- ===== Header ===== -->
-    <div class="header">
+    <div class="header" v-if="!isModal">
       <div class="title-wrapper">
         <img class="back-icon" src="/images/backArrow.svg" @click="goBack" />
         <h1 class="title">평가서 상세</h1>
@@ -20,7 +20,7 @@
     </div>
 
     <div class="content">
-      <div class="form-box">
+      <div class="form-box" :class="{ 'modal-form-box': isModal }">
 
         <!-- ===== 평가명 ===== -->
         <h2 class="section-title">
@@ -214,13 +214,24 @@ import Chart from "chart.js/auto";
 const route = useRoute();
 const router = useRouter();
 
+const props = defineProps<{
+  isModal?: boolean;
+  modalEvaluationId?: number;
+  modalEmployeeId?: number;
+}>();
+
+const emit = defineEmits(['close']);
+
 /**
  * 설명: 이전 페이지 이동하는 메소드
  */
-const goBack = () => router.back();
+const goBack = () => {
+  if (props.isModal) emit('close');
+  else router.back();
+};
 
-const evaluationId = Number(route.params.id);
-const employeeId = Number(route.query.employeeId);
+const evaluationId = props.isModal ? props.modalEvaluationId! : Number(route.params.id);
+const employeeId = props.isModal ? props.modalEmployeeId! : Number(route.query.employeeId);
 
 //Reactive 데이터
 const evaluation = ref<any>({});
@@ -292,19 +303,26 @@ const renderChart = async () => {
  * 설명: 평가서 데이터 조회 메소드
  */
 const loadDetail = async () => {
-  const { data } = await apiClient.get(
-    `/evaluation/evaluation-form/${evaluationId}/${employeeId}`
-  );
+  try {
+    const response = await apiClient.get(
+      `/evaluation/evaluation-form/${evaluationId}/${employeeId}`
+    );
 
-  evaluation.value = {
-    ...data,
-    evaluationFormEvaluationPeriodStart:
-      data.evaluationFormEvaluationPeriodStart?.slice(0, 10),
-    evaluationFormEvaluationPeriodEnd:
-      data.evaluationFormEvaluationPeriodEnd?.slice(0, 10),
-  };
+    // API 응답 구조에 따라 데이터 추출 (CustomResponse 대응)
+    const data = response.data.data || response.data;
 
-  renderChart();
+    evaluation.value = {
+      ...data,
+      evaluationFormEvaluationPeriodStart:
+        data.evaluationFormEvaluationPeriodStart?.slice(0, 10),
+      evaluationFormEvaluationPeriodEnd:
+        data.evaluationFormEvaluationPeriodEnd?.slice(0, 10),
+    };
+
+    renderChart();
+  } catch (error) {
+    console.error('평가 상세 조회 실패:', error);
+  }
 };
 
 /**
@@ -324,6 +342,11 @@ onMounted(loadDetail);
   background: #f5f6fa;
 }
 
+.container.modal-container {
+  min-height: auto;
+  height: 100%;
+}
+
 .content {
   padding: 24px;
   flex: 1;
@@ -340,6 +363,12 @@ onMounted(loadDetail);
   display: flex;
   flex-direction: column;
   gap: 32px;
+}
+
+.form-box.modal-form-box {
+  border: none;
+  padding: 0;
+  max-width: none;
 }
 
 /* ================= Header ================= */

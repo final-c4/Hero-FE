@@ -103,15 +103,16 @@ const handleImageError = () => {
   imageLoadError.value = true;
 };
 
-// 사용자 정보(이미지 경로)가 변경되면 에러 상태 초기화
-watch(() => user.value?.imagePath, () => {
+// 사용자 정보가 변경되면 에러 상태 초기화
+watch(() => user.value, () => {
   imageLoadError.value = false;
-});
+}, { deep: true });
 
 // 프로필 이미지 URL 계산
 const profileImageUrl = computed(() => {
-  return user.value?.imagePath || '';
+  return user.value?.imagePath||'';
 });
+
 
 // 메인 로고 버튼 클릭 시 대시보드 이동
 const goDashboard = () => {

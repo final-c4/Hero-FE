@@ -157,8 +157,8 @@
             </div>
 
             <div class="extra-actions">
-              <button class="btn-extra" disabled title="기능 준비중입니다.">평가 상세</button>
-              <button class="btn-extra" disabled title="기능 준비중입니다.">근태 상세</button>
+              <button class="btn-extra" @click="openEvaluationModal(candidate)">평가 상세</button>
+              <button class="btn-extra" @click="openAttendanceDrawer(candidate)">근태 상세</button>
             </div>
 
             <div class="member-action" v-if="!isReviewed(candidate)">
@@ -201,6 +201,20 @@
       </div>
 
     </div>
+
+    <!-- 근태 상세 드로어 -->
+    <EmployeeHalfChartDrawer
+      :open="showAttendanceDrawer"
+      :employee-id="attendanceEmployeeId"
+      @close="showAttendanceDrawer = false"
+    />
+
+    <!-- 평가 이력 모달 -->
+    <EvaluationHistoryModal
+      :is-open="showEvaluationModal"
+      :employee-id="evaluationEmployeeId"
+      @close="showEvaluationModal = false"
+    />
   </div>
 </template>
 
@@ -209,6 +223,8 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { usePromotionReviewStore } from '@/stores/personnel/promotionReview.store';
 import type { PromotionDetailForReviewResponseDTO, PromotionCandidateDTO, PromotionReviewRequestDTO } from '@/types/personnel/promotion.types';
+import EmployeeHalfChartDrawer from '@/views/attendance/attendanceDashBoard/EmplloyeeHalfChartDrawer.vue';
+import EvaluationHistoryModal from '@/views/evaluation/EvaluationHistoryModal.vue';
 
 const router = useRouter();
 const reviewStore = usePromotionReviewStore();
@@ -221,6 +237,28 @@ const editComment = ref('');
 const step = ref(1);
 const selectedPlanId = ref<number | null>(null);
 const selectedDetailPlan = ref<PromotionDetailForReviewResponseDTO | null>(null);
+
+// 근태 상세 드로어 상태
+const showAttendanceDrawer = ref(false);
+const attendanceEmployeeId = ref<number | null>(null);
+
+const openAttendanceDrawer = (candidate: PromotionCandidateDTO) => {
+  if (candidate.employeeId) {
+    attendanceEmployeeId.value = candidate.employeeId;
+    showAttendanceDrawer.value = true;
+  }
+};
+
+// 평가 이력 모달 상태
+const showEvaluationModal = ref(false);
+const evaluationEmployeeId = ref<number | null>(null);
+
+const openEvaluationModal = (candidate: PromotionCandidateDTO) => {
+  if (candidate.employeeId) {
+    evaluationEmployeeId.value = candidate.employeeId;
+    showEvaluationModal.value = true;
+  }
+};
 
 onMounted(() => {
   // 심사 가능한 계획 목록 조회
