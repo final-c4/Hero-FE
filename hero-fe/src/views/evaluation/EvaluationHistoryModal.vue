@@ -30,9 +30,9 @@
           <ul v-else-if="store.evaluationList.length > 0" class="history-list">
             <li
               v-for="item in store.evaluationList"
-              :key="item.formId"
+              :key="item.evaluationId"
               class="history-item"
-              @click="openDetail(item.formId)"
+              @click="openDetail(item.evaluationId)"
             >
               <div class="item-info">
                 <span class="eval-name">{{ item.evaluationName }}</span>
@@ -78,8 +78,8 @@ watch(
   }
 );
 
-const openDetail = (formId: number) => {
-  selectedEvaluationId.value = formId;
+const openDetail = (evaluationId: number) => {
+  selectedEvaluationId.value = evaluationId;
 };
 
 const closeModal = () => {

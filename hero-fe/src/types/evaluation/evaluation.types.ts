@@ -10,7 +10,7 @@
 
 // 평가 이력 목록 응답 DTO
 export interface EmployeeEvaluationListResponseDTO {
-  formId: number;
+  evaluationId: number;
   evaluationName: string;
   totalRank: string;
   createdAt: string;

@@ -187,17 +187,6 @@
             </template>
           </div>
         </div>
-
-        <!-- 전자 결재 상신 버튼 영역 -->
-        <div class="step-footer">
-          <div class="footer-info">
-            <p>심사가 완료되었나요?</p>
-            <span>전자 결재를 상신하여 최종 승인 절차를 진행하세요.</span>
-          </div>
-          <button class="btn-electronic-approval" @click="handleElectronicApproval" disabled title="기능 준비중입니다.">
-            📑 전자 결재 상신 (준비중)
-          </button>
-        </div>
       </div>
 
     </div>

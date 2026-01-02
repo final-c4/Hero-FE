@@ -18,6 +18,13 @@
         <h1 class="title">평가서 상세</h1>
       </div>
     </div>
+    
+    <!-- ===== Modal Header (Back Button) ===== -->
+    <div class="modal-header-bar" v-else>
+      <button class="btn-back-modal" @click="goBack">
+        <span class="arrow">←</span> 목록으로 돌아가기
+      </button>
+    </div>
 
     <div class="content">
       <div class="form-box" :class="{ 'modal-form-box': isModal }">
@@ -230,8 +237,8 @@ const goBack = () => {
   else router.back();
 };
 
-const evaluationId = props.isModal ? props.modalEvaluationId! : Number(route.params.id);
-const employeeId = props.isModal ? props.modalEmployeeId! : Number(route.query.employeeId);
+const evaluationId = props.isModal ? (props.modalEvaluationId ?? 0) : Number(route.params.id);
+const employeeId = props.isModal ? (props.modalEmployeeId ?? 0) : Number(route.query.employeeId);
 
 //Reactive 데이터
 const evaluation = ref<any>({});
@@ -303,6 +310,11 @@ const renderChart = async () => {
  * 설명: 평가서 데이터 조회 메소드
  */
 const loadDetail = async () => {
+  if (!evaluationId || !employeeId) {
+    console.warn('유효하지 않은 평가 ID 또는 사원 ID입니다.', { evaluationId, employeeId });
+    return;
+  }
+
   try {
     const response = await apiClient.get(
       `/evaluation/evaluation-form/${evaluationId}/${employeeId}`
@@ -400,6 +412,26 @@ onMounted(loadDetail);
   height: 24px;
   cursor: pointer;
 }
+
+/* ================= Modal Header ================= */
+.modal-header-bar {
+  padding: 16px 24px 0 24px;
+  display: flex;
+  align-items: center;
+}
+
+.btn-back-modal {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-back-modal:hover { color: #334155; }
 
 /* ================= Typography ================= */
 .section-title {
