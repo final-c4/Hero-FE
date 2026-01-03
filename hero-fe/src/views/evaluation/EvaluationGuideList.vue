@@ -59,25 +59,10 @@
         </div>
 
         <!-- 페이징 (UI용) -->
-        <div class="paging">
-          <div class="page-btn" @click="goPage(currentPage - 1)">
-            이전
-          </div>
-
-          <div
-            class="page-btn"
-            v-for="page in pageNumbers"
-            :key="page"
-            :class="{ active: page === currentPage }"
-            @click="goPage(page)"
-          >
-            {{ page + 1 }}
-          </div>
-
-          <div class="page-btn" @click="goPage(currentPage + 1)">
-            다음
-          </div>
-        </div>
+        <SlidingPagination
+          v-model="currentPage"
+          :total-pages="totalPages"
+        />
       </div>
     </div>
   </div>
@@ -87,9 +72,10 @@
 <script setup lang="ts">
 //Import 구문
 import apiClient from "@/api/apiClient"
-import { ref, onMounted, computed } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useAuthStore } from '@/stores/auth';
+import SlidingPagination from '@/components/common/SlidingPagination.vue';
 
 //외부 로직
 const router = useRouter();
@@ -208,6 +194,10 @@ const createGuide = () => {
 const goToDetail = (guideId: number) => {
   router.push(`/evaluation/guide/${guideId}`)
 }
+
+watch(currentPage, () => {
+  selectEvaluationGuideList();
+});
 
 /**
  * 설명: 마운트 시 전체 평가 가이드 데이터 조회하는 생명주기 훅
