@@ -14,22 +14,18 @@
   @version 1.0
   </pre>
 */
-
-/**
- * UTC 시간 문자열을 상대 시간으로 변환
- * 
- * @param {string} utcDateString - UTC 시간 문자열 (ISO 8601 형식)
- * @returns {string} 상대 시간 표시 (예: "방금 전", "3분 전")
- * 
- * @example
- * getRelativeTime('2025-01-03T10:00:00Z') // "5분 전"
- */
-export const getRelativeTime = (utcDateString: string): string => {
-  // UTC 시간을 Date 객체로 변환 (자동으로 로컬 시간으로 변환됨)
-  const utcDate = new Date(utcDateString);
-  const now = new Date();
+export const getRelativeTime = (dateString: string): string => {
+  // 시간대 정보가 없는 경우 강제로 UTC로 처리
+  let utcDate: Date;
   
-  // 현재 시간과의 차이 계산 (밀리초)
+  if (!dateString.includes('Z') && !dateString.includes('+')) {
+    // 'Z'나 '+' 가 없으면 UTC로 간주하고 'Z' 추가
+    utcDate = new Date(dateString.replace(' ', 'T') + 'Z');
+  } else {
+    utcDate = new Date(dateString);
+  }
+  
+  const now = new Date();
   const diffMs = now.getTime() - utcDate.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   
@@ -42,6 +38,5 @@ export const getRelativeTime = (utcDateString: string): string => {
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays < 7) return `${diffDays}일 전`;
   
-  // 7일 이상 지난 경우 날짜 표시
   return utcDate.toLocaleDateString('ko-KR');
 };
