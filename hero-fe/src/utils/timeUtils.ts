@@ -17,14 +17,23 @@
   export const getRelativeTime = (dateString: string): string => {
   if (!dateString) return '';
 
-  // 1. Z나 + 기호를 붙이지 않고, 서버가 준 문자열 그대로 Date 객체 생성
-  // (서버와 클라이언트가 모두 한국 시간 기준일 때 가장 정확함)
-  const date = new Date(dateString.replace(' ', 'T'));
+  // 1. 현재 클라이언트(브라우저)의 날짜 객체 생성
   const now = new Date();
-
-  const diffMs = now.getTime() - date.getTime();
   
-  // 미래 시간으로 계산되는 오차 방지
+  // 2. 서버 날짜 문자열에서 시간 정보 추출 (T 또는 공백 기준 분리)
+  // 예: "2026-01-03 13:00:00" -> "13:00:00" 추출
+  const timePart = dateString.includes('T') ? dateString.split('T')[1] : dateString.split(' ')[1];
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+  
+  // 3. 현재 날짜 객체에 서버의 시/분/초를 주입 (핵심 로직)
+  // 서버-클라이언트 간의 날짜 차이가 없다면 이 방식이 가장 정확합니다.
+  const targetDate = new Date();
+  targetDate.setHours(hours, minutes, seconds, 0);
+
+  // 4. 경과 시간 계산
+  const diffMs = now.getTime() - targetDate.getTime();
+  
+  // 미래 시간 오차 방지 (방금 온 알림 처리)
   if (diffMs < 0) return '방금 전';
 
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -37,5 +46,5 @@
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays < 7) return `${diffDays}일 전`;
   
-  return date.toLocaleDateString('ko-KR');
+  return targetDate.toLocaleDateString('ko-KR');
 };
