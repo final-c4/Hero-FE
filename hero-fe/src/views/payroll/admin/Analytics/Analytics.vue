@@ -14,7 +14,6 @@
 <template>
   <div class="report-page">
     <div class="panel">
-      <!-- 상단: 탭 + 월 드롭다운 -->
       <div class="panel-top">
         <div class="panel-tabs">
           <button
@@ -75,7 +74,6 @@ type TabKey = 'summary' | 'structure' | 'org';
 
 const activeTab = ref<TabKey>('summary');
 
-// YYYY-MM 옵션 생성 (최근 12개월)
 const monthOptions = computed(() => {
   const now = new Date();
   const pad = (n: number) => String(n).padStart(2, '0');
@@ -110,7 +108,6 @@ const selectedMonth = ref<YearMonth>(monthOptions.value[0] as YearMonth);
   overflow: hidden;
 }
 
-/* 탭 + 월 필터를 한 줄로 */
 .panel-top {
   display: flex;
   align-items: stretch;
@@ -158,7 +155,6 @@ const selectedMonth = ref<YearMonth>(monthOptions.value[0] as YearMonth);
   opacity: 0.5;
 }
 
-/* 오른쪽 월 드롭다운 */
 .toolbar {
   display: flex;
   align-items: center;

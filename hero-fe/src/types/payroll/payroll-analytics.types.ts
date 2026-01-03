@@ -1,9 +1,18 @@
 /**
- * 급여 Analytics(Admin) 응답 타입 정의
- * - /api/payroll/admin/analytics/*
+ * TypeScript Name : payroll-analytics.types.ts
+ * Description     : 급여 Analytics(Admin) 응답 / 쿼리 타입 정의
+ *                  - Overview / Organization / Composition
+ *                  - /api/payroll/admin/analytics/*
+ *
+ * History
+ *  2026/01/02 - 동근 최초 작성
+ *
+ * @module payroll-analytics-types
+ * @author 동근
+ * @version 1.0
  */
 
-export type YearMonth = `${number}-${string}`; // "YYYY-MM" 정도로만 가볍게
+export type YearMonth = `${number}-${string}`;
 
 /* =========================
  * Overview
@@ -26,13 +35,13 @@ export interface PayrollAnalyticsOverviewKpi {
 export interface PayrollAnalyticsOverviewNetPay {
     avgNetPay: number;
     medianNetPay: number;
-    momChangeRate: number | null; // 전월 대비(%) - 없을 수 있음
+    momChangeRate: number | null;
 }
 
 export interface PayrollAnalyticsOverviewTrendPoint {
     month: string;
     laborCostTotal: number;
-    momChangeRate: number | null; // 첫 포인트는 null
+    momChangeRate: number | null;
 }
 
 /* =========================
@@ -148,16 +157,16 @@ export interface PayrollAnalyticsCompositionMonthStackRow {
  * ========================= */
 
 export interface AnalyticsOverviewQuery {
-    month: string; // "YYYY-MM"
+    month: string;
     trendMonths?: number;
 }
 
 export interface AnalyticsOrganizationQuery {
-    month: string; // "YYYY-MM"
+    month: string;
     deptId?: number;
 }
 
 export interface AnalyticsCompositionQuery {
-    month: string; // "YYYY-MM"
+    month: string;
     trendMonths?: number;
 }

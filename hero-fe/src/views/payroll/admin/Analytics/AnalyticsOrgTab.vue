@@ -219,7 +219,6 @@ import { usePayrollAnalyticsStore } from '@/stores/payroll/payrollAnalytics.stor
 const props = defineProps<{ month: string }>();
 const store = usePayrollAnalyticsStore();
 
-/* ===== state ===== */
 const org = computed(() => store.organization);
 
 const kpi = computed(() => org.value?.kpi ?? null);
@@ -244,15 +243,14 @@ const selectedDeptKey = ref<string>('ALL');
 type DeptSortKey = 'headcount' | 'grossTotal' | 'deductionTotal' | 'netTotal' | 'momChangeRate';
 type SortOrder = 'ASC' | 'DESC';
 
-const sortKey = ref<DeptSortKey>('netTotal'); // 기본값: 실지급액
-const sortOrder = ref<SortOrder>('DESC');     // 기본값: 내림차순(현재처럼)
+const sortKey = ref<DeptSortKey>('netTotal'); 
+const sortOrder = ref<SortOrder>('DESC'); 
 
 const sortedDepartments = computed(() => {
   const list = [...(departments.value ?? [])];
   const key = sortKey.value;
   const dir = sortOrder.value === 'ASC' ? 1 : -1;
 
-  // null/undefined 방어 + 안정 정렬(부서명 타이브레이커)
   return list.sort((a, b) => {
     const av = (a as any)?.[key];
     const bv = (b as any)?.[key];
@@ -375,7 +373,6 @@ function renderDeptStack() {
         { label: '연장', data: overtime, stack: 'total', borderWidth: 1, yAxisID: 'y' },
         { label: '상여', data: bonus, stack: 'total', borderWidth: 1, yAxisID: 'y' },
         { label: '공제', data: deductionNeg, stack: 'total', borderWidth: 1, yAxisID: 'y' },
-        // ✅ 라인(우측 축): 1인 평균 실지급액
         {
           type: 'line',
           label: '1인 평균 실지급액',
@@ -398,7 +395,6 @@ function renderDeptStack() {
             label: (context) => {
               const label = context.dataset.label ?? '';
               const raw = Number(context.parsed?.y ?? 0);
-              // 공제는 음수로 들어가 있으니 표시만 양수로
               if (label === '공제') return `${label}: ${formatWon(Math.abs(raw))}`;
               return `${label}: ${formatWon(raw)}`;
             },

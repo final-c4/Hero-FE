@@ -1,3 +1,18 @@
+/**
+ * TypeScript Name : payroll-analytics.store.ts
+ * Description     : 급여 Analytics(Admin) 상태 관리 Pinia Store
+ *                  - Overview / Organization / Composition 데이터 관리
+ *                  - 간단 캐시를 통한 중복 요청 방지
+ *
+ * History
+ *  2026/01/02 - 동근 최초 작성
+ *
+ * @module payroll-analytics-store
+ * @author 동근
+ * @version 1.0
+ */
+
+
 import { defineStore } from 'pinia';
 import type {
     PayrollAnalyticsCompositionResponse,
@@ -23,19 +38,15 @@ const makeKey = (path: string, params: Record<string, KeyParamValue>) =>
 
 export const usePayrollAnalyticsStore = defineStore('payrollAnalytics', {
     state: () => ({
-        // data
         overview: null as PayrollAnalyticsOverviewResponse | null,
         organization: null as PayrollAnalyticsOrgResponse | null,
         composition: null as PayrollAnalyticsCompositionResponse | null,
 
-        // ui state
         overviewState: 'idle' as LoadState,
         organizationState: 'idle' as LoadState,
         compositionState: 'idle' as LoadState,
 
         errorMessage: null as string | null,
-
-        // 간단 캐시(같은 요청 반복 방지)
         cache: new Map<string, CacheValue>(),
     }),
 
@@ -46,8 +57,6 @@ export const usePayrollAnalyticsStore = defineStore('payrollAnalytics', {
 
         extractErrorMessage(e: unknown, fallback: string) {
             if (e instanceof Error && e.message) return e.message;
-
-            // axios 에러 형태 방어적으로 파싱
             const maybe = e as {
                 response?: { data?: { message?: string } };
                 message?: string;

@@ -5,16 +5,14 @@
  *
  * History
  *   2026/01/02 - 동근 최초 작성
- *   2026/01/02 - ChatGPT Overview 연동/차트/지표 완성
  * </pre>
  *
  * @module payroll-report-summary-tab
  * @author 동근
- * @version 1.1
+ * @version 1.0
 -->
 <template>
   <div class="report-tab">
-    <!-- KPI 4개 -->
     <div class="card-grid">
       <div class="stat-card">
         <div class="label">대상 인원</div>
@@ -49,7 +47,6 @@
       </div>
     </div>
 
-    <!-- 라인 차트 (풀폭) -->
     <div class="chart-card mt">
       <div class="chart-title">월별 총 인건비 추이</div>
       <div class="chart-body">
@@ -73,7 +70,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Chart } from 'chart.js/auto';
 
-import { usePayrollAnalyticsStore } from '@/stores/payroll/payrollAnalytics.store'; // ✅ 너 pasted 기준
+import { usePayrollAnalyticsStore } from '@/stores/payroll/payrollAnalytics.store';
 import type { PayrollAnalyticsOverviewTrendPoint } from '@/types/payroll/payroll-analytics.types';
 
 const props = defineProps<{
@@ -94,11 +91,6 @@ const hasSelectedMonthData = computed(() => {
 
 const isLoading = computed(() => store.overviewState === 'loading');
 const isError = computed(() => store.overviewState === 'error');
-
-/* =========================
- * Load
- * ========================= */
-
 async function reload() {
   await store.loadOverview(props.month, TREND_MONTHS);
   await nextTick();
@@ -115,11 +107,6 @@ watch(
     await reload();
   }
 );
-
-/* =========================
- * Number format
- * ========================= */
-
 function formatInt(v?: number | null) {
   const n = typeof v === 'number' ? v : 0;
   return new Intl.NumberFormat('ko-KR').format(n);
@@ -135,11 +122,6 @@ function formatPct(v?: number | null) {
   const sign = v > 0 ? '+' : '';
   return `${sign}${v.toFixed(2)}%`;
 }
-
-/* =========================
- * Chart
- * ========================= */
-
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 let chart: Chart | null = null;
 
@@ -166,7 +148,6 @@ function renderChart() {
   if (!canvasRef.value) return;
   const rows = trend.value;
   if (!rows || rows.length === 0) return;
-    // 선택 월 데이터가 없으면 차트를 그리지 않음
   if (!rows.some((r) => r.month === props.month)) return;
 
   const labels = rows.map((r) => r.month);
@@ -220,7 +201,6 @@ function renderChart() {
             callback: (v) => {
               const n = typeof v === 'number' ? v : Number(v);
               if (!Number.isFinite(n)) return '';
-              // 1,000,000 단위 이상이면 "백만" 느낌으로 너무 줄이지 말고 그냥 콤마
               return new Intl.NumberFormat('ko-KR').format(n);
             },
           },
@@ -248,8 +228,6 @@ onBeforeUnmount(() => {
 .report-tab {
   padding: 0 20px;
 }
-
-/* KPI */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -285,7 +263,6 @@ onBeforeUnmount(() => {
 }
 
 .mt { margin-top: 12px; }
-/* Chart */
 .chart-card {
   border: 1px solid #eef2f7;
   border-radius: 12px;

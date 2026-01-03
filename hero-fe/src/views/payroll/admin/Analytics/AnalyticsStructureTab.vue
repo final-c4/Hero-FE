@@ -5,18 +5,15 @@
  *
  * History
  *   2026/01/02 - 동근 최초 작성
- *   2026/01/02 - Composition 연동/차트/테이블 완성
  * </pre>
  *
  * @module payroll-report-structure-tab
  * @author 동근
- * @version 1.1
+ * @version 1.0
 -->
 <template>
   <div class="report-tab">
-    <!-- 상단 2열: 부서 비율(원형) / 항목 요약 -->
     <div class="grid-2">
-      <!-- 부서별 인건비 비율 -->
       <div class="card">
         <div class="card-title">부서별 인건비 비율</div>
 
@@ -52,7 +49,6 @@
         </div>
       </div>
 
-      <!-- 수당/공제 항목 요약 -->
       <div class="card">
         <div class="card-title">수당 · 공제 항목 요약</div>
 
@@ -64,7 +60,6 @@
             <button class="btn-retry" type="button" @click="reload">재시도</button>
           </div>
           <div v-else class="item-grid">
-            <!-- Allowance -->
             <div class="mini">
               <div class="mini-title">
                 수당 Top 3
@@ -90,7 +85,6 @@
               </table>
             </div>
 
-            <!-- Deduction -->
             <div class="mini">
               <div class="mini-title">
                 공제 Top 3
@@ -120,7 +114,6 @@
       </div>
     </div>
 
-    <!-- 부담 종류 표 -->
     <div class="card mt">
       <div class="card-title">부담 종류</div>
       <div class="card-body">
@@ -150,7 +143,6 @@
                 <td class="right">{{ formatWon(r.totalAmount) }}</td>
               </tr>
 
-              <!-- 총계 row -->
               <tr class="total-row">
                 <td class="name">총계</td>
                 <td class="right">{{ formatWon(burdenTotals.employee) }}</td>
@@ -163,13 +155,11 @@
       </div>
     </div>
 
-    <!-- 월별 급여 구성 변화 (스택) -->
     <div class="card mt">
       <div class="card-title">급여 구성 변화</div>
       <div class="card-desc">
         최근 {{ trendMonths }}개월 월별 구성 스택 차트
       </div>
-
       <div class="card-body">
         <div v-if="isLoading" class="empty">로딩 중...</div>
         <div v-else-if="isError" class="error">
@@ -181,9 +171,6 @@
 
         <div v-else class="stack-wrap">
           <canvas ref="stackBarRef" class="stack-canvas"></canvas>
-          <div class="note">
-            * 현재 백엔드 stackTrend 응답에는 “회사부담(월별)”이 포함되어 있지 않아. 필요하면 백엔드에 월별 employer trend 집계를 추가하면 스택에 합칠 수 있어.
-          </div>
         </div>
       </div>
     </div>
@@ -194,7 +181,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { Chart } from 'chart.js/auto';
 
-import { usePayrollAnalyticsStore } from '@/stores/payroll/payrollAnalytics.store'; // 너 프로젝트 기준
+import { usePayrollAnalyticsStore } from '@/stores/payroll/payrollAnalytics.store';
 import type {
   PayrollAnalyticsCompositionDeptShareRow,
   PayrollAnalyticsCompositionItemRow,
@@ -206,10 +193,6 @@ const props = defineProps<{ month: string }>();
 
 const store = usePayrollAnalyticsStore();
 const trendMonths = 6;
-
-/* =========================
- * Data
- * ========================= */
 const composition = computed(() => store.composition);
 
 const deptShare = computed<PayrollAnalyticsCompositionDeptShareRow[]>(() => composition.value?.deptShare ?? []);
@@ -220,10 +203,6 @@ const stackTrend = computed<PayrollAnalyticsCompositionMonthStackRow[]>(() => co
 
 const isLoading = computed(() => store.compositionState === 'loading');
 const isError = computed(() => store.compositionState === 'error');
-
-/* =========================
- * Derived
- * ========================= */
 const deptShareTopLimit = 8;
 const deptShareTop = computed(() => deptShare.value.slice(0, deptShareTopLimit));
 
@@ -241,10 +220,6 @@ const burdenTotals = computed(() => {
   const total = burden.value.reduce((a, r) => a + (r.totalAmount ?? 0), 0);
   return { employee, employer, total };
 });
-
-/* =========================
- * Load
- * ========================= */
 async function reload() {
   await store.loadComposition(props.month, trendMonths);
   await nextTick();
@@ -262,10 +237,6 @@ watch(
     await reload();
   }
 );
-
-/* =========================
- * Format
- * ========================= */
 function formatWon(v?: number | null) {
   const n = typeof v === 'number' ? v : 0;
   return `${new Intl.NumberFormat('ko-KR').format(n)}원`;
@@ -275,9 +246,6 @@ function formatPct(v?: number | null) {
   return `${n.toFixed(2)}%`;
 }
 
-/* =========================
- * Charts
- * ========================= */
 const deptPieRef = ref<HTMLCanvasElement | null>(null);
 const stackBarRef = ref<HTMLCanvasElement | null>(null);
 
@@ -307,7 +275,6 @@ function renderDeptPie() {
   const ctx = deptPieRef.value.getContext('2d');
   if (!ctx) return;
 
-  // pie는 너무 많으면 난잡해서 상위 N + 기타로 묶기
   const rows = deptShare.value;
   const top = rows.slice(0, deptShareTopLimit);
   const rest = rows.slice(deptShareTopLimit);
@@ -342,7 +309,6 @@ function renderDeptPie() {
             label: (context) => {
               const label = context.label ?? '';
               const value = context.parsed ?? 0;
-              // 비율은 원 데이터의 sharePct를 그대로 쓰기 어려워서(기타 묶음) 금액 표시 위주
               return `${label}: ${formatWon(Number(value))}`;
             },
           },
@@ -366,16 +332,10 @@ function renderStackBar() {
 
   const rows = stackTrend.value;
   const labels = rows.map((r) => r.month);
-
-  // 요구: 기본급, 수당, 공제, 회사부담
-  // 현재 응답: base, allowance, overtime, bonus, deduction
-  // -> 수당을 allowanceTotal로 쓰되, 연장/상여는 별도 스택으로 보여주면 분석에 좋음
   const base = rows.map((r) => r.baseTotal ?? 0);
   const allowanceTotal = rows.map((r) => r.allowanceTotal ?? 0);
   const overtime = rows.map((r) => r.overtimeTotal ?? 0);
   const bonus = rows.map((r) => r.bonusTotal ?? 0);
-
-  // 공제는 “감소 요인”이라 스택에서 아래로 내려가게 음수로 표현
   const deductionNeg = rows.map((r) => -1 * (r.deductionTotal ?? 0));
 
   stackBarChart = new Chart(ctx, {
@@ -397,7 +357,6 @@ function renderStackBar() {
         bar: {
           categoryPercentage: 0.6,
           barPercentage: 0.6,
-          // maxBarThickness: 26, // 필요하면 상한도 걸 수 있음(선택)
         },
       },
       plugins: {
@@ -545,8 +504,6 @@ onBeforeUnmount(() => {
 .pct { font-size: 12px; font-weight: 900; color: #334155; }
 .amt { font-size: 11px; font-weight: 800; color: #64748b; }
 .legend-more { margin-top: 6px; font-size: 11px; font-weight: 800; color: #94a3b8; }
-
-/* items */
 .item-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .mini { border: 1px solid #eef2f7; border-radius: 10px; overflow: hidden; }
 .mini-title {
@@ -562,10 +519,7 @@ onBeforeUnmount(() => {
 .mini-sub { font-size: 11px; font-weight: 800; color: #64748b; }
 
 .mini-empty { padding: 16px 12px; text-align: center; color: #94a3b8; font-weight: 900; font-size: 12px; }
-
-/* ===== history-like table (급여이력 톤 통일) ===== */
 .table-wrap { border: 1px solid #eef2f7; border-radius: 10px; overflow: hidden; }
-
 .history-table {
   width: 100%;
   border-collapse: collapse;
@@ -577,33 +531,20 @@ onBeforeUnmount(() => {
   text-align: left;
   padding: 12px 20px;
 }
-
-/* right: 정렬/강조만 담당 (색상은 컨텍스트별로 분리) */
 .right { text-align: right; font-weight: 900; }
-
-/* header gradient */
 .table-header {
   background: linear-gradient(180deg, #1c398e 0%, #162456 100%);
   color: #fff;
 }
-/* header에서 right가 색을 덮지 못하게 강제 */
 .table-header th { color: #fff; }
-
-/* zebra */
 .table-body tr:nth-child(2n) { background-color: #e2e8f0; }
-
-/* body value color */
 .history-table td.right { color: #0f172a; }
 .name { font-weight: 900; color: #0f172a; }
-
-/* compact: 항목 요약(미니 표)용 */
 .history-table--compact th,
 .history-table--compact td {
   padding: 10px 12px;
   font-size: 12px;
 }
-
-/* total row */
 .total-row td {
   background: #f8fafc;
   font-weight: 900;
