@@ -13,22 +13,24 @@
   @author 혜원
   @version 1.0
   </pre>
-*/
-export const getRelativeTime = (dateString: string): string => {
-  // 시간대 정보가 없는 경우 강제로 UTC로 처리
-  let utcDate: Date;
+*/export const getRelativeTime = (dateString: string): string => {
+  if (!dateString) return '';
+
+  // 1. 서버 시간을 Date 객체로 생성
+  // 서버가 UTC 문자열을 준다면 new Date(dateString)만으로도 충분하지만,
+  // 형식이 불분명할 경우를 대비해 처리합니다.
+  const date = new Date(dateString);
   
-  if (!dateString.includes('Z') && !dateString.includes('+')) {
-    // 'Z'나 '+' 가 없으면 UTC로 간주하고 'Z' 추가
-    utcDate = new Date(dateString.replace(' ', 'T') + 'Z');
-  } else {
-    utcDate = new Date(dateString);
-  }
-  
+  // 2. 현재 시간
   const now = new Date();
-  const diffMs = now.getTime() - utcDate.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
   
+  // 3. 차이 계산 (밀리초 단위)
+  const diffMs = now.getTime() - date.getTime();
+  
+  // ⚠️ 만약 미래 시간으로 찍힌다면 (서버-클라이언트 시간 오차), 방금 전 처리
+  if (diffMs < 0) return '방금 전';
+
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
   if (diffMinutes < 1) return '방금 전';
   if (diffMinutes < 60) return `${diffMinutes}분 전`;
   
@@ -38,5 +40,5 @@ export const getRelativeTime = (dateString: string): string => {
   const diffDays = Math.floor(diffHours / 24);
   if (diffDays < 7) return `${diffDays}일 전`;
   
-  return utcDate.toLocaleDateString('ko-KR');
+  return date.toLocaleDateString('ko-KR');
 };
