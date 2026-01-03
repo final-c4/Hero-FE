@@ -13,21 +13,18 @@
   @author 혜원
   @version 1.0
   </pre>
-*/export const getRelativeTime = (dateString: string): string => {
+*/
+  export const getRelativeTime = (dateString: string): string => {
   if (!dateString) return '';
 
-  // 1. 서버 시간을 Date 객체로 생성
-  // 서버가 UTC 문자열을 준다면 new Date(dateString)만으로도 충분하지만,
-  // 형식이 불분명할 경우를 대비해 처리합니다.
-  const date = new Date(dateString);
-  
-  // 2. 현재 시간
+  // 1. Z나 + 기호를 붙이지 않고, 서버가 준 문자열 그대로 Date 객체 생성
+  // (서버와 클라이언트가 모두 한국 시간 기준일 때 가장 정확함)
+  const date = new Date(dateString.replace(' ', 'T'));
   const now = new Date();
-  
-  // 3. 차이 계산 (밀리초 단위)
+
   const diffMs = now.getTime() - date.getTime();
   
-  // ⚠️ 만약 미래 시간으로 찍힌다면 (서버-클라이언트 시간 오차), 방금 전 처리
+  // 미래 시간으로 계산되는 오차 방지
   if (diffMs < 0) return '방금 전';
 
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
