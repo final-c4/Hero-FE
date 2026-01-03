@@ -19,8 +19,8 @@
         <div class="header">
           <button
             class="btn-new"
-            :class="{ disabled: authDepartmentId !== 2 }"
-            :disabled="authDepartmentId !== 2"
+            :class="{ disabled: !authStore.hasAnyRole(['ROLE_SYSTEM_ADMIN','ROLE_HR_MANAGER','ROLE_HR_EVALUATION']) }"
+            :disabled="!authStore.hasAnyRole(['ROLE_SYSTEM_ADMIN','ROLE_HR_MANAGER','ROLE_HR_EVALUATION'])"
             @click="createTemplate"
           >
             + 새 템플릿 작성
@@ -56,33 +56,10 @@
         </div>
 
         <!--페이지 네이션 버튼-->
-        <div class="paging" v-if="totalPages > 0">
-          <div
-            class="page-btn"
-            :class="{ disabled: currentPage === 0 }"
-            @click="goPrev"
-          >
-            이전
-          </div>
-
-          <div
-            v-for="page in totalPages"
-            :key="page"
-            class="page-btn"
-            :class="{ active: currentPage === page - 1 }"
-            @click="goToPage(page - 1)"
-          >
-            {{ page }}
-          </div>
-
-          <div
-            class="page-btn"
-            :class="{ disabled: currentPage === totalPages - 1 }"
-            @click="goNext"
-          >
-            다음
-          </div>
-        </div>
+        <SlidingPagination
+          v-model="currentPage"
+          :total-pages="totalPages"
+        />
       </div>
     </div>
   </div>
@@ -91,9 +68,10 @@
 <!--script-->
 <script setup lang="ts">
 import apiClient from '@/api/apiClient';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import SlidingPagination from '@/components/common/SlidingPagination.vue';
 
 
 // useRouter()를 router변수로 정의 (외부 로직)
@@ -257,6 +235,10 @@ const goNext = async () => {
     await goToPage(currentPage.value + 1)
   }
 }
+
+watch(currentPage, () => {
+  selectEvaluationTemplateList();
+});
 
 /**
  * 설명 : 페이지 마운트 시, 전체 평가 템플릿의 데이터를 조회하기 위한 생명주기(onMounted) 훅

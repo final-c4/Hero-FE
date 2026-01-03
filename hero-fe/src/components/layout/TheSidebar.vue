@@ -163,12 +163,18 @@
                @click="handleSubMenuClick('guide')">
             <div class="sub-menu-text">평가 가이드</div>
           </div>
-          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'teamDash' }"
-               @click="handleSubMenuClick('teamDash')">
+          <div 
+            v-if="canSeeTeamDashboard"
+            class="sub-menu-item" :class="{ active: activeSubMenu === 'teamDash' }"
+            @click="handleSubMenuClick('teamDash')"
+          >
             <div class="sub-menu-text">팀 평가 대시보드</div>
           </div>
-          <div class="sub-menu-item" :class="{ active: activeSubMenu === 'deptDash' }"
-               @click="handleSubMenuClick('deptDash')">
+          <div 
+            v-if="canSeeDeptDashboard"
+            class="sub-menu-item" :class="{ active: activeSubMenu === 'deptDash' }"
+            @click="handleSubMenuClick('deptDash')"
+          >
             <div class="sub-menu-text">부서별 역량 대시보드</div>
           </div>
         </div>
@@ -372,6 +378,19 @@ const canSeeAttendanceDashboard = computed(() =>
   ])
 );
 
+const canSeeTeamDashboard = computed(() => 
+  authStore.hasAnyRole([
+    'ROLE_SYSTEM_ADMIN',
+    'ROLE_DEPT_MANAGER',
+  ])
+);
+const canSeeDeptDashboard = computed(() =>
+  authStore.hasAnyRole([
+    'ROLE_SYSTEM_ADMIN',
+    'ROLE_HR_EVALUATION',
+  ])
+)
+
 const router = useRouter();
 const route = useRoute();
 
@@ -484,7 +503,7 @@ const handleSubMenuClick = (key: string) => {
   if (key === 'employeeList') {
     router.push('/personnel/list');
   } else if (key === 'turnover') {
-    router.push('/personnel/turnover'); // 이직률
+    router.push('/personnel/retirement/turnover'); // 이직률
   } else if (key === 'plan') {
     router.push('/personnel/promotion/plan');
   } else if (key === 'recommend') {
