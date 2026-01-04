@@ -4,28 +4,29 @@
   Description: 알림 아이템 컴포넌트
                 - 알림 타입별 아이콘 표시
                 - 읽음/안 읽음 상태 스타일 구분
-                - 클릭 시 상세 페이지 이동
-                - 액션 버튼 및 삭제 버튼 제공
+                - 링크 버튼 클릭 시 관련 페이지 이동
+                - 삭제 버튼 제공
 
   History
   2025/12/09 (혜원) 최초작성
   2025/12/14 (혜원) TypeScript 변환 및 타입 정의
   2025/12/16 (혜원) Notification 타입 맞춤 수정, 링크 버튼 추가
   2026/01/04 (혜원) 알림 디자인 수정
+  2026/01/04 (혜원) 아이템 클릭 제거, 버튼만 클릭 가능하도록 수정
   </pre>
 
   @author 혜원
-  @version 2.2
+  @version 2.3
 -->
 
 <template>
-  <!-- 알림 아이템 최상위 컨테이너 -->
+  <!-- 알림 아이템 최상위 컨테이너 (클릭 불가) -->
   <div
     class="notification-item"
     :class="{ unread: !notification.isRead }"
   >
-    <!-- 알림 헤더 영역 (클릭 가능) -->
-    <div class="notification-header" @click="handleClick">
+    <!-- 알림 헤더 영역 (클릭 불가로 변경) -->
+    <div class="notification-header">
       <!-- 알림 타입 아이콘 -->
       <img
         :src="getIcon(notification.type)"
@@ -41,16 +42,16 @@
         <!-- 알림 메시지 (2줄 말줄임) -->
         <p class="description">{{ notification.message }}</p>
 
-        <!-- ✅ 시간 + 링크버튼을 같은 줄로 -->
+        <!-- 시간 + 링크버튼을 같은 줄로 -->
         <div class="meta-row">
           <span class="time">{{ notification.timeAgo }}</span>
 
-          <!-- ✅ 원래 있던 링크 버튼 로직 유지 (link 있을 때만) -->
+          <!-- 원래 있던 링크 버튼 로직 유지 (link 있을 때만) -->
           <button
             v-if="notification.link"
             class="link-btn inline"
             type="button"
-            @click.stop="handleLinkClick"
+            @click.stop="handleViewClick"
           >
             {{ getLinkText(notification.type) }}
           </button>
@@ -68,7 +69,7 @@
       </button>
 
       <!-- 링크 버튼 영역 (link가 있을 때만 표시) -->
-      <!-- ✅ 기존 구조는 남겨두되, '같은 줄' 요구사항 때문에 실제 버튼은 meta-row에 배치 -->
+      <!-- 기존 구조는 남겨두되, '같은 줄' 요구사항 때문에 실제 버튼은 meta-row에 배치 -->
       <div v-if="notification.link" class="notification-footer">
         <!-- (기존 자리 유지용 / 필요하면 여기 스타일로 다른 액션 넣어도 됨) -->
       </div>
@@ -78,17 +79,9 @@
 
 <script setup lang="ts">
 // 1. Import 구문
-import { useRouter } from 'vue-router';
 import type { Notification, NotificationCategory } from '@/types/notification/notification.types';
 
-// 2. Composables
-/**
- * Vue Router 인스턴스
- * 페이지 이동에 사용
- */
-const router = useRouter();
-
-// 3. Props 정의
+// 2. Props 정의
 /**
  * 컴포넌트 Props
  *
@@ -105,54 +98,40 @@ const props = defineProps<{
   notification: Notification;
 }>();
 
-// 4. Emits 정의
+// 3. Emits 정의
 /**
  * 컴포넌트 이벤트 정의
  *
- * @event click - 알림 아이템 클릭 시 발생
- *                부모 컴포넌트에서 읽음 처리 및 상세 로직 실행
- *                @param {Notification} notification - 클릭된 알림 객체
+ * @event view - 상세 보기 버튼 클릭 시 발생
+ *               부모 컴포넌트에서 읽음 처리 및 페이지 이동 처리
+ *               @param {Notification} notification - 클릭된 알림 객체
  *
  * @event delete - 삭제 버튼 클릭 시 발생
  *                 부모 컴포넌트에서 소프트 삭제 처리
  *                 @param {number} id - 삭제할 알림 ID
  */
 const emit = defineEmits<{
-  click: [notification: Notification];
+  view: [notification: Notification];
   delete: [id: number];
 }>();
 
-// 5. 이벤트 핸들러
+// 4. 이벤트 핸들러
 
 /**
- * 알림 아이템 클릭 핸들러
+ * 상세 보기 버튼 클릭 핸들러
  */
-const handleClick = (): void => {
-  emit('click', props.notification);
+const handleViewClick = (): void => {
+  emit('view', props.notification);
 };
 
 /**
  * 삭제 버튼 클릭 핸들러
  */
-const handleDeleteClick = (event: Event): void => {
-  event.stopPropagation(); // 부모 요소로 이벤트 전파 방지 (핵심!)
+const handleDeleteClick = (): void => {
   emit('delete', props.notification.notificationId);
 };
 
-/**
- * 링크 버튼 클릭 핸들러
- */
-const handleLinkClick = (): void => {
-  if (props.notification.link) {
-    // 1. 읽음 처리 요청 (부모 컴포넌트에 위임)
-    emit('click', props.notification);
-
-    // 2. 페이지 이동
-    router.push(props.notification.link);
-  }
-};
-
-// 6. 헬퍼 함수 (비즈니스 로직)
+// 5. 헬퍼 함수 (비즈니스 로직)
 
 /**
  * 알림 타입에 따른 아이콘 경로 반환
@@ -197,6 +176,7 @@ const getLinkText = (type: NotificationCategory): string => {
   border-radius: 8px;
   margin-bottom: 12px;
   overflow: hidden;
+  cursor: default; /* 클릭 불가능 표시 */
 }
 
 /* 공통 띠 */
@@ -243,10 +223,11 @@ const getLinkText = (type: NotificationCategory): string => {
   align-items: flex-start;
   gap: 16px;
   padding: 16px;
-  cursor: pointer;
-  position: relative; /* 삭제 버튼 절대 위치의 기준점 */
+  position: relative;
+  cursor: default; /* 클릭 불가능 */
 }
 
+/* 호버 효과는 유지 (시각적 피드백) */
 .notification-header:hover {
   background: rgba(0, 0, 0, 0.02);
 }
@@ -422,6 +403,16 @@ const getLinkText = (type: NotificationCategory): string => {
     width: 24px;
     height: 24px;
     font-size: 14px;
+  }
+
+  .meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .link-btn.inline {
+    width: 100%;
   }
 }
 </style>

@@ -12,10 +12,11 @@
   2025/12/16 (혜원) 최초 작성
   2025/12/17 (혜원) 알림 마운트 수정
   2026/01/04 (혜원) 스타일 수정
+  2026/01/04 (혜원) 설정 저장 후 페이지 이동 제거
   </pre>
 
   @author 혜원
-  @version 1.2
+  @version 1.3
 -->
 <template>
   <div class="notification-settings-page">
@@ -245,21 +246,37 @@ const handleBrowserNotificationChange = async () => {
   }
 };
 
+/**
+ * 설정 저장 핸들러
+ * - 페이지 이동 없이 현재 페이지에 머물기
+ */
 const handleSaveSettings = async () => {
   const result = await settingsStore.saveSettings();
 
   if (result.success) {
     alert('설정이 저장되었습니다.');
-    router.push('/notifications');
+    // router.push 제거 - 페이지 이동하지 않음
   } else {
     alert('설정 저장에 실패했습니다.');
   }
 };
 
-const handleResetSettings = () => {
+/**
+ * 기본값으로 되돌리기 핸들러
+ * - 설정 초기화 후 저장하고 현재 페이지에 머물기
+ */
+const handleResetSettings = async () => {
   if (confirm('설정을 기본값(모두 ON)으로 되돌리시겠습니까?')) {
     settingsStore.resetSettings();
-    handleSaveSettings();
+    
+    const result = await settingsStore.saveSettings();
+    
+    if (result.success) {
+      alert('설정이 기본값으로 되돌려졌습니다.');
+      // 페이지 이동하지 않음
+    } else {
+      alert('설정 저장에 실패했습니다.');
+    }
   }
 };
 
