@@ -255,6 +255,7 @@ const handleSaveSettings = async () => {
 
   if (result.success) {
     alert('설정이 저장되었습니다.');
+    // router.push 제거 - 페이지 이동하지 않음
   } else {
     alert('설정 저장에 실패했습니다.');
   }
@@ -272,6 +273,7 @@ const handleResetSettings = async () => {
     
     if (result.success) {
       alert('설정이 기본값으로 되돌려졌습니다.');
+      // 페이지 이동하지 않음
     } else {
       alert('설정 저장에 실패했습니다.');
     }
@@ -297,16 +299,16 @@ onMounted(async () => {
   z-index: 10;
 
   width: 100%;
-  height: 56px;
-  padding: 0 16px;
+  height: 56px;                 /* 고정 높이 */
+  padding: 0 16px;              /* 과한 padding 제거 */
   background: #fff;
   border-bottom: 1px solid #e5e7eb;
 
   display: flex;
-  align-items: center;
+  align-items: center;          /* 수직 가운데 */
   gap: 12px;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: hidden;            
 }
 
 .back-btn {
@@ -334,7 +336,7 @@ onMounted(async () => {
 .back-icon {
   width: 20px;
   height: 20px;
-  display: block;
+  display: block;            
 }
 
 .settings-title {
@@ -342,7 +344,7 @@ onMounted(async () => {
   font-size: 20px;
   font-weight: 700;
   color: #1f2937;
-  line-height: 1;
+  line-height: 1;             
   display: flex;
   align-items: center;
   white-space: nowrap;
@@ -424,7 +426,7 @@ onMounted(async () => {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  display: block;
+  display: block;              
 }
 
 .setting-content {
