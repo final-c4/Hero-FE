@@ -15,7 +15,7 @@
  *
  * @module payroll-history
  * @author 동근
- * @version 1.0
+ * @version 1.1
 -->
 <template>
   <div class="pay-history-page">
