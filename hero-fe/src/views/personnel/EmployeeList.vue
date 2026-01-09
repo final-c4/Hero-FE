@@ -189,6 +189,25 @@ const loadSearchOptions = async () => {
     if (response.data.success) {
       const { department, grade, jobTitle } = response.data.data;
       departmentOptions.value = department.sort();
+
+      // const departmentOrder = [
+      //   '발령대기 부서',
+      //   '경영지원본부',
+      //   '인사팀', '총무팀', '재무팀',
+      //   '개발본부',
+      //   '백엔드팀', '프론트엔드팀', '보안팀',
+      //   '영업본부',
+      //   '마케팅팀', '고객지원팀', '영업기획팀'
+      // ];
+
+      // departmentOptions.value = department.sort((a: string, b: string) => {
+      //   const indexA = departmentOrder.indexOf(a);
+      //   const indexB = departmentOrder.indexOf(b);
+      //   if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      //   if (indexA !== -1) return -1;
+      //   if (indexB !== -1) return 1;
+      //   return a.localeCompare(b);
+      // });
       gradeOptions.value = grade;
       jobTitleOptions.value = jobTitle;
     }
