@@ -188,7 +188,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(row, index) in departmentStats" :key="row.departmentName" :class="{ 'row-striped': index % 2 === 1 }">
+                  <tr v-for="(row, index) in filteredDepartmentStats" :key="row.departmentName" :class="{ 'row-striped': index % 2 === 1 }">
                     <td>{{ row.departmentName }}</td>
                     <td class="text-center">{{ row.currentCount }}명</td>
                     <td class="text-center">{{ row.retiredCount }}명</td>
@@ -198,7 +198,7 @@
                       </span>
                     </td>
                   </tr>
-                  <tr v-if="departmentStats.length === 0">
+                  <tr v-if="filteredDepartmentStats.length === 0">
                     <td colspan="4" class="empty-row">데이터가 없습니다.</td>
                   </tr>
                 </tbody>
@@ -344,6 +344,12 @@ const newHireChartData = computed(() => {
       }
     ]
   };
+});
+
+// 4. 부서별 이직률 테이블 데이터 (본부 제외)
+const filteredDepartmentStats = computed(() => {
+  if (!departmentStats.value) return [];
+  return departmentStats.value.filter((stat: any) => !stat.departmentName.includes('본부'));
 });
 
 // --- Chart Options ---
